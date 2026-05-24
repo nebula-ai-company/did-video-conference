@@ -35,6 +35,12 @@ const App: React.FC = () => {
     setCurrentView(AppView.HOME);
   };
 
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setUserSettings(prev => ({ ...prev, displayName: 'کاربر مهمان' }));
+    setCurrentView(AppView.LOGIN);
+  };
+
   // Handle Theme
   useEffect(() => {
     const root = window.document.documentElement;
@@ -56,6 +62,7 @@ const App: React.FC = () => {
             isAuthenticated={isAuthenticated}
             userSettings={userSettings}
             updateSettings={updateSettings}
+            onLogout={handleLogout}
           />
         );
       case AppView.LOGIN:
@@ -109,6 +116,8 @@ const App: React.FC = () => {
             setMeetingId={setMeetingId} 
             isAuthenticated={isAuthenticated}
             userSettings={userSettings}
+            updateSettings={updateSettings}
+            onLogout={handleLogout}
           />
         );
     }

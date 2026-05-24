@@ -491,7 +491,7 @@ export const Meeting: React.FC<MeetingProps> = ({ onChangeView, meetingId, userS
       )}
 
       {/* --- Main Content Layout --- */}
-      <main className="flex-1 flex overflow-hidden pt-24 px-6 pb-[8.25rem] gap-6">
+      <main className="flex-1 flex overflow-hidden pt-16 sm:pt-24 px-3 sm:px-6 pb-20 sm:pb-[8.25rem] gap-4 sm:gap-6">
         
         {/* Sidebar Panel (Desktop: Floating Card Animation) */}
         {/* We keep it rendered but animate width/opacity to create the "push" effect */}
@@ -514,7 +514,7 @@ export const Meeting: React.FC<MeetingProps> = ({ onChangeView, meetingId, userS
         </div>
 
         {/* Video Grid Area (Resizes automatically with Flex) */}
-        <div className="flex-1 min-w-0 h-full relative transition-all duration-500 ease-in-out flex flex-col">
+        <div className="flex-1 min-w-0 h-full overflow-y-auto custom-scrollbar relative transition-all duration-500 ease-in-out flex flex-col">
              
              {screenShare ? (
                 // Screen Share Layout
@@ -556,9 +556,9 @@ export const Meeting: React.FC<MeetingProps> = ({ onChangeView, meetingId, userS
                 </div>
              ) : (
                 // Standard Grid Layout
-                <div className={`grid gap-4 w-full h-full transition-all duration-500 justify-items-center items-center ${getGridClasses()}`}>
+                <div className={`grid gap-4 w-full min-h-full transition-all duration-500 justify-items-center items-center ${getGridClasses()}`}>
                     {participants.map(p => (
-                        <div key={p.id} className="w-full h-full min-h-0 min-w-0 transition-all duration-500 flex items-center justify-center">
+                        <div key={p.id} className="w-full h-full min-h-[150px] sm:min-h-[200px] md:min-h-[245px] min-w-0 transition-all duration-500 flex items-center justify-center">
                             <VideoTile 
                                 participant={{
                                     ...p, 
@@ -596,12 +596,12 @@ export const Meeting: React.FC<MeetingProps> = ({ onChangeView, meetingId, userS
           
           {/* Reaction Popup (Absolute positioning maintained for stacked effect) */}
           {showEmojiPicker && (
-              <div className={`absolute bottom-32 pointer-events-auto ${isDark ? 'bg-[#18181b]/90 border-white/10' : 'bg-white/95 border-slate-200 shadow-2xl text-slate-800'} backdrop-blur-xl border rounded-2xl p-2 flex gap-2 shadow-2xl animate-[enter-up_0.3s_ease-out_forwards] z-[60]`}>
+              <div className={`absolute bottom-20 sm:bottom-28 pointer-events-auto ${isDark ? 'bg-[#18181b]/90 border-white/10' : 'bg-white/95 border-slate-200 shadow-2xl text-slate-800'} backdrop-blur-xl border rounded-2xl p-1.5 sm:p-2 flex gap-1.5 sm:gap-2 shadow-2xl animate-[enter-up_0.3s_ease-out_forwards] z-[60]`}>
                   {['👍', '❤️', '👏', '😂', '😮', '🎉'].map(emoji => (
                       <button 
                         key={emoji}
                         onClick={() => triggerReaction(emoji)}
-                        className="text-2xl hover:bg-white/10 p-2 rounded-xl transition-colors hover:scale-125 transform duration-200"
+                        className="text-xl sm:text-2xl hover:bg-white/10 p-1.5 sm:p-2 rounded-xl transition-colors hover:scale-125 transform duration-200"
                       >
                           {emoji}
                       </button>
@@ -610,37 +610,37 @@ export const Meeting: React.FC<MeetingProps> = ({ onChangeView, meetingId, userS
           )}
 
           {/* Unified Dock Container (LTR forced for order control) */}
-          <div className="flex items-center gap-4 pointer-events-auto" dir="ltr">
+          <div className="flex items-center gap-2 sm:gap-4 pointer-events-auto" dir="ltr">
               
               {/* LEFT: Cheer Controls Panel */}
               <div className={`
                   flex items-center justify-end overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]
                   ${musicShare ? 'max-w-[400px] opacity-100 translate-x-0' : 'max-w-0 opacity-0 translate-x-12'}
               `}>
-                  <div className={`${isDark ? 'bg-black/60 border-white/10 ring-white/5 shadow-2xl' : 'bg-white/95 border-slate-200 shadow-xl text-slate-800'} backdrop-blur-2xl border rounded-[2rem] h-20 px-3 flex items-center justify-center gap-1 ring-1 mx-1 w-[260px]`}>
+                  <div className={`${isDark ? 'bg-black/60 border-white/10 ring-white/5 shadow-2xl' : 'bg-white/95 border-slate-200 shadow-xl text-slate-800'} backdrop-blur-2xl border rounded-2xl sm:rounded-[2rem] h-14 sm:h-20 px-2 sm:px-3 flex items-center justify-center gap-0.5 sm:gap-1 ring-1 mx-1 w-[180px] sm:w-[260px]`}>
                       {[
-                          { id: 'shake', label: 'لرزش', icon: <Activity className="w-5 h-5" /> },
-                          { id: 'dance', label: 'رقص', icon: <Music className="w-5 h-5" /> },
-                          { id: 'flash', label: 'فلش', icon: <Zap className="w-5 h-5" /> },
-                          { id: 'party', label: 'پارتی', icon: <Sparkles className="w-5 h-5" /> },
+                          { id: 'shake', label: 'لرزش', icon: <Activity className="w-4 h-4 sm:w-5 sm:h-5" /> },
+                          { id: 'dance', label: 'رقص', icon: <Music className="w-4 h-4 sm:w-5 sm:h-5" /> },
+                          { id: 'flash', label: 'فلش', icon: <Zap className="w-4 h-4 sm:w-5 sm:h-5" /> },
+                          { id: 'party', label: 'پارتی', icon: <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" /> },
                       ].map(effect => (
                           <button 
                              key={effect.id}
-                             className="flex flex-col items-center justify-center w-14 h-14 rounded-2xl hover:bg-white/10 hover:text-white text-gray-400 transition-all gap-1 group select-none"
+                             className="flex flex-col items-center justify-center w-9 h-9 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl hover:bg-white/10 hover:text-white text-gray-400 transition-all gap-0.5 sm:gap-1 group select-none"
                              title={effect.label}
                              onClick={() => triggerReaction(effect.id === 'party' ? '🎉' : '⚡')} 
                           >
                               <div className="group-hover:scale-110 transition-transform duration-300 group-hover:text-primary-400">{effect.icon}</div>
-                              <span className="text-[10px] font-bold">{effect.label}</span>
+                              <span className="text-[8px] sm:text-[10px] font-bold">{effect.label}</span>
                           </button>
                       ))}
                   </div>
               </div>
 
               {/* CENTER: Main Control Bar */}
-              <div className={`relative z-20 ${isDark ? 'bg-[#09090b]/80 border-white/10 hover:bg-[#09090b]/90 ring-white/5 shadow-2xl' : 'bg-white/95 border-slate-200 shadow-xl text-slate-800'} backdrop-blur-xl border rounded-[2rem] h-20 px-6 flex items-center gap-3 transition-all duration-300 hover:scale-[1.02]`}>
+              <div className={`relative z-20 ${isDark ? 'bg-[#09090b]/80 border-white/10 hover:bg-[#09090b]/90 ring-white/5 shadow-2xl' : 'bg-white/95 border-slate-200 shadow-xl text-slate-800'} backdrop-blur-xl border rounded-2xl sm:rounded-[2rem] h-14 sm:h-20 px-3 sm:px-6 flex items-center gap-1.5 sm:gap-3 transition-all duration-300 hover:scale-[1.02]`}>
                   {/* Media Controls */}
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1 sm:gap-2">
                       <ControlButton 
                         active={micOn} 
                         onClick={() => setMicOn(!micOn)} 
@@ -657,10 +657,10 @@ export const Meeting: React.FC<MeetingProps> = ({ onChangeView, meetingId, userS
                       />
                   </div>
 
-                  <div className={`w-px h-8 ${isDark ? 'bg-white/10' : 'bg-slate-200'} mx-2`}></div>
+                  <div className={`w-px h-6 sm:h-8 ${isDark ? 'bg-white/10' : 'bg-slate-200'} mx-1 sm:mx-2`}></div>
 
                   {/* Action Controls */}
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1 sm:gap-2">
                       <ControlButton 
                         active={screenShare} 
                         onClick={handleScreenShare} 
@@ -707,7 +707,7 @@ export const Meeting: React.FC<MeetingProps> = ({ onChangeView, meetingId, userS
                       />
                   </div>
 
-                  <div className={`w-px h-8 ${isDark ? 'bg-white/10' : 'bg-slate-200'} mx-2`}></div>
+                  <div className={`w-px h-6 sm:h-8 ${isDark ? 'bg-white/10' : 'bg-slate-200'} mx-1 sm:mx-2`}></div>
 
                   {/* End Call */}
                   <button 
@@ -717,10 +717,10 @@ export const Meeting: React.FC<MeetingProps> = ({ onChangeView, meetingId, userS
                         if (musicStream) musicStream.getTracks().forEach(t => t.stop());
                         onChangeView(AppView.SUMMARY);
                     }}
-                    className="bg-red-500 hover:bg-red-600 text-white rounded-[1.2rem] h-11 px-6 flex items-center gap-2 transition-all font-bold shadow-lg shadow-red-500/20 hover:shadow-red-500/40"
+                    className="bg-red-500 hover:bg-red-600 text-white rounded-xl sm:rounded-[1.2rem] h-9 sm:h-11 px-3 sm:px-6 flex items-center gap-1.5 sm:gap-2 transition-all font-bold shadow-lg shadow-red-500/20 hover:shadow-red-500/40"
                   >
-                      <PhoneOff className="w-5 h-5" />
-                      <span className="hidden sm:inline text-sm">پایان جلسه</span>
+                      <PhoneOff className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <span className="hidden sm:inline text-xs sm:text-sm">پایان جلسه</span>
                   </button>
               </div>
 
@@ -759,7 +759,7 @@ export const Meeting: React.FC<MeetingProps> = ({ onChangeView, meetingId, userS
 // --- Subcomponent for Clean Controls ---
 const ControlButton = ({ active, onClick, onIcon, offIcon, variant = 'toggle', className = '', title = '' }: any) => {
     const isDark = typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : true;
-    let baseClass = "h-11 w-11 rounded-[1.2rem] flex items-center justify-center transition-all duration-200 ";
+    let baseClass = "h-9 w-9 sm:h-11 sm:w-11 rounded-lg sm:rounded-[1.2rem] flex items-center justify-center transition-all duration-200 ";
     
     if (variant === 'toggle') {
         baseClass += active 
@@ -775,7 +775,7 @@ const ControlButton = ({ active, onClick, onIcon, offIcon, variant = 'toggle', c
 
     return (
         <button onClick={onClick} className={`${baseClass} ${className}`} title={title}>
-            {React.cloneElement(active ? onIcon : offIcon, { className: "w-5 h-5" })}
+            {React.cloneElement(active ? onIcon : offIcon, { className: "w-4 h-4 sm:w-5 sm:h-5" })}
         </button>
     )
 }

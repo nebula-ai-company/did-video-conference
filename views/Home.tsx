@@ -18,9 +18,10 @@ interface HomeProps {
   isAuthenticated: boolean;
   userSettings: UserSettings;
   updateSettings: (updates: Partial<UserSettings>) => void;
+  onLogout?: () => void;
 }
 
-export const Home: React.FC<HomeProps> = ({ onChangeView, setMeetingId, isAuthenticated, userSettings, updateSettings }) => {
+export const Home: React.FC<HomeProps> = ({ onChangeView, setMeetingId, isAuthenticated, userSettings, updateSettings, onLogout }) => {
   const [inputCode, setInputCode] = useState('');
 
   const handleJoin = (code?: string) => {
@@ -111,6 +112,7 @@ export const Home: React.FC<HomeProps> = ({ onChangeView, setMeetingId, isAuthen
         userSettings={userSettings} 
         onChangeView={onChangeView} 
         updateSettings={updateSettings}
+        onLogout={onLogout}
       />
 
       {/* --- Main Content --- */}

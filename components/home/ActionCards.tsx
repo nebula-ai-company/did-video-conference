@@ -169,14 +169,13 @@ const JoinMeetingCard = ({ inputCode, setInputCode, onJoinMeeting }: { inputCode
                 <p className="text-base text-gray-500 dark:text-gray-400 mt-1">کد جلسه را دارید؟</p>
             </div>
 
-            <div className="relative z-10 mt-4">
-                <div className={`
-                    relative bg-gray-50/50 dark:bg-black/40 backdrop-blur-md rounded-2xl overflow-hidden transition-all duration-300
-                    ${isFocused || inputCode.length > 0 ? 'ring-2 ring-primary-500 shadow-lg shadow-primary-500/10' : 'ring-1 ring-white/10'}
-                `}>
+            <div className="relative z-10 mt-4 flex justify-center">
+                <div className="relative h-20 flex items-center justify-center w-full">
+                    {/* The Hidden Real Input */}
                     <input
                         type="text"
-                        placeholder="----"
+                        pattern="[0-9]*"
+                        inputMode="numeric"
                         value={inputCode}
                         onFocus={() => setIsFocused(true)}
                         onBlur={() => setIsFocused(false)}
@@ -184,24 +183,69 @@ const JoinMeetingCard = ({ inputCode, setInputCode, onJoinMeeting }: { inputCode
                             const val = e.target.value.replace(/[^0-9]/g, '');
                             if (val.length <= 4) setInputCode(val);
                         }}
-                        onKeyDown={(e) => e.key === 'Enter' && onJoinMeeting()}
-                        className="w-full bg-transparent border-none text-center text-4xl font-bold tracking-[0.5em] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-700 focus:outline-none focus:ring-0 py-6 pl-20 pr-4 font-mono h-24"
-                        dir="ltr"
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && inputCode.length === 4) {
+                                onJoinMeeting();
+                            }
+                        }}
+                        className="absolute inset-0 w-full h-full opacity-0 z-20 cursor-text text-transparent caret-transparent select-none"
                         maxLength={4}
+                        autoComplete="off"
                     />
                     
-                    {/* Floating Action Button */}
-                    <div className={`
-                        absolute left-3 top-3 bottom-3 aspect-square transition-all duration-500 cubic-bezier(0.34, 1.56, 0.64, 1) z-20
-                        ${inputCode.length > 0 ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0 pointer-events-none'}
-                    `}>
-                        <button
-                            onClick={onJoinMeeting}
-                            disabled={inputCode.length < 4}
-                            className="w-full h-full bg-gray-900 dark:bg-white text-white dark:text-black rounded-xl flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                        >
-                            <ArrowLeft className="w-7 h-7" strokeWidth={2.5} />
-                        </button>
+                    {/* Visual Segmented Input */}
+                    <div className="relative flex gap-2.5 sm:gap-3 items-center justify-center z-30 pointer-events-none w-full">
+                        <div className="flex gap-2 sm:gap-3" dir="ltr">
+                            {[0, 1, 2, 3].map((index) => {
+                                const char = inputCode[index] || '';
+                                const isCurrent = index === inputCode.length;
+                                const isActiveBox = isFocused && isCurrent;
+                                const isFilled = char !== '';
+                                
+                                return (
+                                    <div 
+                                        key={index}
+                                        className={`
+                                            w-11 h-11 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center text-2xl sm:text-3xl font-black text-gray-900 dark:text-white transition-all duration-300 backdrop-blur-md relative
+                                            ${isActiveBox 
+                                                ? 'bg-white dark:bg-black/50 ring-2 ring-primary-500 border-transparent shadow-lg shadow-primary-500/25 scale-105' 
+                                                : isFilled 
+                                                    ? 'bg-white/60 dark:bg-black/40 border border-primary-500/20 shadow-sm' 
+                                                    : 'bg-gray-50/30 dark:bg-black/20 border border-white/10'
+                                            }
+                                        `}
+                                    >
+                                        {char}
+                                        
+                                        {/* Custom Caret Animation */}
+                                        {isActiveBox && (
+                                            <span className="absolute bottom-2.5 left-1/2 -translate-x-1/2 w-4 sm:w-5 h-1 bg-primary-500 rounded-full animate-pulse" />
+                                        )}
+                                        
+                                        {/* Empty State dash marker (only if not active/filled) */}
+                                        {!isFilled && !isActiveBox && (
+                                            <span className="w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-slate-600" />
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        {/* Floating Action Button nested in the flex container so it pushes gracefully */}
+                        <div className={`
+                            transition-all duration-500 ease-out flex items-center relative z-40 pointer-events-auto
+                            ${inputCode.length === 4 ? 'w-11 sm:w-14 opacity-100 scale-100' : 'w-0 opacity-0 scale-50 pointer-events-none overflow-hidden'}
+                        `}>
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onJoinMeeting();
+                                }}
+                                className="w-11 h-11 sm:w-14 sm:h-14 bg-primary-600 hover:bg-primary-500 active:scale-95 text-white rounded-2xl flex items-center justify-center shadow-lg transition-all cursor-pointer"
+                            >
+                                <ArrowLeft className="w-5.5 h-5.5 sm:w-6 sm:h-6" strokeWidth={2.5} />
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

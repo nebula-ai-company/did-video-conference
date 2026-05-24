@@ -174,14 +174,14 @@ export const VideoTile: React.FC<VideoTileProps> = ({ participant, onPin, mediaS
                 
                 {/* Central Avatar */}
                 <div 
-                    className="relative z-10 w-24 h-24 sm:w-32 sm:h-32 rounded-full p-1 bg-gradient-to-tr from-gray-800 to-gray-700 shadow-2xl ring-4 ring-black/20 transition-transform duration-100 ease-out"
+                    className="relative z-10 w-12 h-12 xs:w-16 xs:h-16 sm:w-20 md:w-24 lg:w-28 rounded-full p-1 bg-gradient-to-tr from-gray-800 to-gray-700 shadow-2xl ring-4 ring-black/20 transition-transform duration-100 ease-out"
                     style={participant.isMe ? { transform: `scale(${1 + localAudioLevel * 0.1})` } : {}}
                 >
                   {participant.avatarUrl ? (
                      <img src={participant.avatarUrl} className="w-full h-full rounded-full object-cover" />
                   ) : (
                      <div className="w-full h-full rounded-full flex items-center justify-center bg-gray-700">
-                         <User className="w-10 h-10 sm:w-14 sm:h-14 text-white/50" />
+                          <User className="w-5 h-5 xs:w-7 xs:h-7 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white/50" />
                      </div>
                   )}
                 </div>
@@ -194,30 +194,30 @@ export const VideoTile: React.FC<VideoTileProps> = ({ participant, onPin, mediaS
       
       {/* Hand Raised Indicator (Top Left) */}
       {participant.isHandRaised && (
-         <div className="absolute top-4 left-4 z-20 bg-primary-600 text-white p-2 rounded-xl shadow-lg shadow-primary-600/30 animate-bounce border border-primary-500/20">
-            <Hand className="w-5 h-5" />
+         <div className="absolute top-2 left-2 sm:top-4 sm:left-4 z-20 bg-primary-600 text-white p-1.5 sm:p-2 rounded-xl shadow-lg shadow-primary-600/30 animate-bounce border border-primary-500/20">
+            <Hand className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
          </div>
       )}
 
       {/* Top Right: Status Icons */}
-      <div className="absolute top-4 right-4 flex items-center gap-2 z-20">
+      <div className="absolute top-2 right-2 sm:top-4 sm:right-4 flex items-center gap-1 sm:gap-2 z-20">
          {/* Mute Indicator */}
          {!participant.audioOn && (
-            <div className="w-8 h-8 rounded-full bg-red-500/90 backdrop-blur-md flex items-center justify-center text-white shadow-lg animate-enter">
-                <MicOff className="w-4 h-4" />
+            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-red-500/90 backdrop-blur-md flex items-center justify-center text-white shadow-lg animate-enter">
+                <MicOff className="w-3 h-3 sm:w-4 sm:h-4" />
             </div>
          )}
          
          {/* Hover Controls */}
-         <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity translate-y-[-10px] group-hover:translate-y-0 duration-300 pointer-events-auto">
-             <div className="h-8 px-2 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center text-white/80">
+         <div className="flex items-center gap-1.5 sm:gap-2 opacity-0 group-hover:opacity-100 transition-opacity translate-y-[-10px] group-hover:translate-y-0 duration-300 pointer-events-auto">
+             <div className="h-6 sm:h-8 px-1.5 sm:px-2 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center text-white/80">
                 {getConnectionIcon()}
              </div>
-             <button className="w-8 h-8 rounded-full bg-black/40 hover:bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center text-white transition-colors">
-                <MoreHorizontal className="w-4 h-4" />
+             <button className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-black/40 hover:bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center text-white transition-colors">
+                <MoreHorizontal className="w-3 h-3 sm:w-4 sm:h-4" />
              </button>
              {onPin && (
-                <button onClick={onPin} className="w-8 h-8 rounded-full bg-black/40 hover:bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center text-white transition-colors">
+                <button onClick={onPin} className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-black/40 hover:bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center text-white transition-colors">
                     <Pin className="w-3.5 h-3.5" />
                 </button>
              )}
@@ -225,19 +225,19 @@ export const VideoTile: React.FC<VideoTileProps> = ({ participant, onPin, mediaS
       </div>
 
       {/* Bottom Left: Name Tag */}
-      <div className="absolute bottom-4 left-4 z-20 max-w-[80%]">
+      <div className="absolute bottom-2 left-2 sm:bottom-4 sm:left-4 z-20 max-w-[85%]">
         <div className="flex flex-col items-start gap-1">
              {/* Name Pill */}
-             <div className="bg-black/40 hover:bg-black/60 backdrop-blur-xl pl-3 pr-4 py-2 rounded-2xl border border-white/10 flex items-center gap-2 shadow-lg transition-colors cursor-default">
+             <div className="bg-black/40 hover:bg-black/60 backdrop-blur-xl pl-2 pr-2.5 py-1 sm:pl-3 sm:pr-4 sm:py-2 rounded-xl sm:rounded-2xl border border-white/10 flex items-center gap-1.5 sm:gap-2 shadow-lg transition-colors cursor-default">
                 {participant.isSpeaking && (
-                    <div className="flex gap-0.5 h-3 items-end">
-                        <div className="w-1 bg-green-500 rounded-full animate-[music-bar_0.8s_ease-in-out_infinite]"></div>
-                        <div className="w-1 bg-green-500 rounded-full animate-[music-bar_0.8s_ease-in-out_infinite_0.1s]"></div>
-                        <div className="w-1 bg-green-500 rounded-full animate-[music-bar_0.8s_ease-in-out_infinite_0.2s]"></div>
+                    <div className="flex gap-0.5 h-2.5 sm:h-3 items-end">
+                        <div className="w-0.5 sm:w-1 bg-green-500 rounded-full animate-[music-bar_0.8s_ease-in-out_infinite]"></div>
+                        <div className="w-0.5 sm:w-1 bg-green-500 rounded-full animate-[music-bar_0.8s_ease-in-out_infinite_0.1s]"></div>
+                        <div className="w-0.5 sm:w-1 bg-green-500 rounded-full animate-[music-bar_0.8s_ease-in-out_infinite_0.2s]"></div>
                     </div>
                 )}
-                <span className="text-white text-sm font-bold truncate leading-none pt-0.5">
-                    {participant.name} {participant.isMe && <span className="text-white/50 font-medium">(شما)</span>}
+                <span className="text-white text-xs sm:text-sm font-bold truncate leading-none pt-0.5">
+                    {participant.name} {participant.isMe && <span className="text-white/50 font-medium text-[10px] sm:text-xs">(شما)</span>}
                 </span>
              </div>
         </div>
