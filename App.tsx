@@ -6,12 +6,15 @@ import { Summary } from './views/Summary';
 import { Login } from './views/Login';
 import { Signup } from './views/Signup';
 import { Settings } from './views/Settings';
+import { AdminLogin } from './views/AdminLogin';
+import { AdminPanel } from './views/AdminPanel';
 import { AppView, UserSettings } from './types';
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<AppView>(AppView.LOGIN);
   const [meetingId, setMeetingId] = useState<string>('');
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
   
   // App-wide state simulating User Context
   const [userSettings, setUserSettings] = useState<UserSettings>({
@@ -38,6 +41,16 @@ const App: React.FC = () => {
   const handleLogout = () => {
     setIsAuthenticated(false);
     setUserSettings(prev => ({ ...prev, displayName: 'کاربر مهمان' }));
+    setCurrentView(AppView.LOGIN);
+  };
+
+  const handleAdminLogin = () => {
+    setIsAdmin(true);
+    setCurrentView(AppView.ADMIN_PANEL);
+  };
+
+  const handleAdminLogout = () => {
+    setIsAdmin(false);
     setCurrentView(AppView.LOGIN);
   };
 
@@ -76,6 +89,22 @@ const App: React.FC = () => {
         return (
           <Signup 
             onChangeView={setCurrentView}
+          />
+        );
+      case AppView.ADMIN_LOGIN:
+        return (
+          <AdminLogin 
+            onChangeView={setCurrentView}
+            onAdminLogin={handleAdminLogin}
+          />
+        );
+      case AppView.ADMIN_PANEL:
+        return (
+          <AdminPanel 
+            onChangeView={setCurrentView}
+            userSettings={userSettings}
+            updateSettings={updateSettings}
+            onLogout={handleAdminLogout}
           />
         );
       case AppView.LOBBY:

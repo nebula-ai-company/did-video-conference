@@ -5,7 +5,9 @@ export enum AppView {
   SETTINGS = 'SETTINGS',
   SUMMARY = 'SUMMARY',
   LOGIN = 'LOGIN',
-  SIGNUP = 'SIGNUP'
+  SIGNUP = 'SIGNUP',
+  ADMIN_LOGIN = 'ADMIN_LOGIN',
+  ADMIN_PANEL = 'ADMIN_PANEL'
 }
 
 export interface Participant {
