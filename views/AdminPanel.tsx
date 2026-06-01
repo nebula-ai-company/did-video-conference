@@ -29,8 +29,39 @@ import {
   WifiHigh,
   UserCheck
 } from '@phosphor-icons/react';
+import { motion } from 'framer-motion';
 import { Button } from '../components/Button';
+import { RequestsView } from '../components/admin/RequestsView';
+import { SettingsView } from '../components/admin/SettingsView';
+import { UsersView } from '../components/admin/UsersView';
 import { AppView, UserSettings } from '../types';
+
+// Spring Physics Stagger Animation Configuration for outstanding fluid transitions
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.05,
+      delayChildren: 0.03
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { y: 16, opacity: 0, filter: 'blur(4px)' },
+  visible: {
+    y: 0,
+    opacity: 1,
+    filter: 'blur(0px)',
+    transition: {
+      type: "spring",
+      stiffness: 120,
+      damping: 18,
+      mass: 0.8
+    }
+  }
+};
 
 interface AdminPanelProps {
   onChangeView: (view: AppView) => void;
@@ -208,6 +239,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 }) => {
   // Current active navigation tab
   const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'orgs' | 'requests' | 'settings'>('overview');
+  const [requestsPage, setRequestsPage] = useState(1);
   const [hoveredPoint, setHoveredPoint] = useState<ChartPoint | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<SecurityEvent | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -238,7 +270,16 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     { id: 'user-3', name: 'علیرضا موسوی', email: 'mousavi@did-voice.ir', orgId: 'org-1', orgName: 'ستاد فناوری اطلاعات دید', role: 'پشتیبان ارتباطات امن', meetingsJoined: 31, totalDurationHours: 64, lastActive: 'دیروز، ۱۵:۴۰', status: 'active' },
     { id: 'user-4', name: 'زهرا رادکان', email: 'radkan@mporg.ir', orgId: 'org-3', orgName: 'سازمان برنامه‌ریزی و بودجه کشور', role: 'رئیس اداره هوشمندسازی', meetingsJoined: 75, totalDurationHours: 182, lastActive: '۲ ساعت پیش', status: 'active' },
     { id: 'user-5', name: 'مهندس بردیا مهران', email: 'b.mehran@sahab-tech.ir', orgId: 'org-2', orgName: 'شرکت ارتباطات نوین سحاب', role: 'کارشناس شبکه', meetingsJoined: 12, totalDurationHours: 24, lastActive: '۳ روز پیش', status: 'inactive' },
-    { id: 'user-6', name: 'نیلوفر رحیمی', email: 'rahimi@did-voice.ir', orgId: 'org-1', orgName: 'ستاد فناوری اطلاعات دید', role: 'طراح تجربه کاربری', meetingsJoined: 46, totalDurationHours: 92, lastActive: 'امروز، ۰۹:۱۵', status: 'active' }
+    { id: 'user-6', name: 'نیلوفر رحیمی', email: 'rahimi@did-voice.ir', orgId: 'org-1', orgName: 'ستاد فناوری اطلاعات دید', role: 'طراح تجربه کاربری', meetingsJoined: 46, totalDurationHours: 92, lastActive: 'امروز، ۰۹:۱۵', status: 'active' },
+    { id: 'user-7', name: 'احسان محمدی', email: 'mohamadi@did-voice.ir', orgId: 'org-1', orgName: 'ستاد فناوری اطلاعات دید', role: 'راهبر سرویس', meetingsJoined: 55, totalDurationHours: 110, lastActive: '۱ ساعت پیش', status: 'active' },
+    { id: 'user-8', name: 'شیرین افشار', email: 'afshar@mporg.ir', orgId: 'org-3', orgName: 'سازمان برنامه‌ریزی و بودجه کشور', role: 'تحلیلگر داده', meetingsJoined: 23, totalDurationHours: 41, lastActive: '۴ روز پیش', status: 'active' },
+    { id: 'user-9', name: 'علی سلطانی', email: 'soltani@tehran.ir', orgId: 'org-4', orgName: 'شهرداری تهران', role: 'سرپرست نظارت', meetingsJoined: 98, totalDurationHours: 215, lastActive: '۵۰ دقیقه پیش', status: 'active' },
+    { id: 'user-10', name: 'فاطمه رستمی', email: 'rostami@sahab-tech.ir', orgId: 'org-2', orgName: 'شرکت ارتباطات نوین سحاب', role: 'برنامه‌نویس فرانت‌اند', meetingsJoined: 120, totalDurationHours: 250, lastActive: 'امروز، ۱۴:۰۰', status: 'active' },
+    { id: 'user-11', name: 'محمدحسین کریمی', email: 'karimi@did-voice.ir', orgId: 'org-1', orgName: 'ستاد فناوری اطلاعات دید', role: 'مهندس توسعه امنیت', meetingsJoined: 15, totalDurationHours: 35, lastActive: '۱ هفته پیش', status: 'inactive' },
+    { id: 'user-12', name: 'سمانه عظیمی', email: 'azimi@mporg.ir', orgId: 'org-3', orgName: 'سازمان برنامه‌ریزی و بودجه کشور', role: 'بازرس ارشد', meetingsJoined: 42, totalDurationHours: 96, lastActive: 'دیروز، ۱۰:۱۰', status: 'active' },
+    { id: 'user-13', name: 'مجید رضایی', email: 'rezaei@did-voice.ir', orgId: 'org-1', orgName: 'ستاد فناوری اطلاعات دید', role: 'کارشناس توسعه', meetingsJoined: 30, totalDurationHours: 45, lastActive: '۳ ساعت پیش', status: 'active' },
+    { id: 'user-14', name: 'پرستو مرادی', email: 'moradi@mporg.ir', orgId: 'org-3', orgName: 'سازمان برنامه‌ریزی و بودجه کشور', role: 'مدیر پروژه', meetingsJoined: 88, totalDurationHours: 160, lastActive: 'امروز، ۰۸:۳۰', status: 'active' },
+    { id: 'user-15', name: 'سینا احمدی', email: 'ahmadi@tehran.ir', orgId: 'org-4', orgName: 'شهرداری تهران', role: 'مهندس سیستم', meetingsJoined: 12, totalDurationHours: 18, lastActive: '۲ روز پیش', status: 'inactive' }
   ]);
 
   const [signupRequests, setSignupRequests] = useState<SignupRequest[]>([
@@ -273,6 +314,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   // Feedback states
   const [feedback, setFeedback] = useState<{ message: string; type: 'success' | 'info' | 'error' } | null>(null);
   const [selectedUserDetail, setSelectedUserDetail] = useState<UserRecord | null>(null);
+  const [selectedOrgDetail, setSelectedOrgDetail] = useState<Org | null>(null);
 
   const showFeedback = (message: string, type: 'success' | 'info' | 'error' = 'success') => {
     setFeedback({ message, type });
@@ -425,151 +467,196 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   );
 
   return (
-    <div className="min-h-screen bg-[#07080e] text-slate-100 font-sans overflow-x-hidden relative flex flex-col md:flex-row transition-all duration-300" dir="rtl">
+    <div className="h-screen bg-[#07080e] text-slate-100 font-sans overflow-x-hidden relative flex flex-col md:flex-row transition-all duration-300" dir="rtl">
       
       {/* Absolute Ambient Gradients for Cinematic Depth */}
       <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-primary-500/[0.03] blur-[180px] rounded-full pointer-events-none z-0" />
       <div className="absolute bottom-10 left-10 w-[500px] h-[500px] bg-blue-600/[0.02] blur-[160px] rounded-full pointer-events-none z-0" />
 
       {/* --- RIGHT-SIDEBAR NAVIGATION MENU (Designed from right for admin sections) --- */}
-      <aside className="w-full md:w-80 shrink-0 bg-[#0c0d15]/90 border-l border-white/5 backdrop-blur-3xl p-6 flex flex-col justify-between z-30 transition-all relative">
-        <div className="space-y-8">
+      <aside className="w-full md:w-80 shrink-0 bg-[#07080d]/95 border-l border-white/5 backdrop-blur-3xl p-6 flex flex-col justify-between z-30 transition-all relative">
+        <div className="space-y-6">
           
           {/* Main Logo & Title block */}
-          <div className="flex items-center gap-3 pb-6 border-b border-white/5">
-            <div className="relative w-11 h-11 flex items-center justify-center bg-gradient-to-tr from-blue-600 to-sky-500 rounded-2xl shadow-lg shadow-blue-500/10 text-white transform">
-              <ShieldCheck className="w-6 h-6" weight="fill" />
+          <div className="flex items-center gap-3 pb-5 border-b border-white/5 select-none">
+            <div className="relative w-10 h-10 flex items-center justify-center bg-gradient-to-tr from-blue-600 via-blue-500 to-sky-400 rounded-xl shadow-lg shadow-blue-500/10 text-white shrink-0">
+              <ShieldCheck className="w-5.5 h-5.5" weight="fill" />
             </div>
             <div className="flex flex-col">
-              <span className="text-base font-black tracking-tight text-white leading-none">مدیریت دید کنفرانس</span>
-              <span className="text-[10px] font-bold text-slate-400 tracking-wider mt-1">مرکز سوئیچ‌برد امن سازمانی</span>
+              <span className="text-[14px] font-black tracking-tight text-white leading-none">مدیریت دید کنفرانس</span>
+              <span className="text-[9px] font-medium text-slate-400/90 tracking-wider mt-1.5">مرکز سوئیچ‌برد امن سازمانی</span>
             </div>
           </div>
 
-          {/* Connected Administrator Profile Badge */}
-          <div className="p-3 bg-white/[0.02] border border-white/5 rounded-2xl flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#1E293B] to-[#0F172A] border border-white/10 flex items-center justify-center text-xs font-black text-blue-400">
-              م‌ا
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xs font-black text-gray-200">سرپرست ارشد سامانه</span>
-              <span className="text-[9px] text-emerald-400 font-bold flex items-center gap-1 mt-0.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                نقش: سرپرست کل هماهنگی
-              </span>
+          {/* Connected Administrator Profile Badge - Premium Double-Bezel Hardness */}
+          <div className="p-1.5 bg-white/[0.01] border border-white/5 rounded-2xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.03)] select-none">
+            <div className="p-3 bg-[#0a0b12] rounded-[calc(1rem-0.125rem)] border border-white/5 flex items-center gap-3 hover:border-white/10 transition-all duration-300">
+              <div className="w-9 h-9 min-w-[36px] rounded-xl bg-gradient-to-b from-slate-900 to-[#12131b] border border-white/10 shadow-[inner_0_1px_1px_rgba(255,255,255,0.1)] flex items-center justify-center text-[10.5px] font-black text-blue-400">
+                م‌ا
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xs font-bold text-slate-200">سرپرست ارشد سامانه</span>
+                <span className="text-[9px] text-emerald-400/90 font-medium flex items-center gap-1.5 mt-1">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)] animate-pulse" />
+                  نقش: سرپرست کل هماهنگی
+                </span>
+              </div>
             </div>
           </div>
 
           {/* Navigation Links (Enterprise segmented buttons) */}
-          <nav className="space-y-1.5">
-            <span className="text-[10px] font-black tracking-widest text-slate-500 uppercase block mb-3.5 px-2">بخش‌های کنترلی سیستم</span>
+          <nav className="space-y-1">
+            <div className="flex items-center justify-between uppercase tracking-wider mb-3 px-1 text-slate-500 select-none">
+              <span className="text-[9px] font-bold">بخش‌های کنترلی سیستم</span>
+              <span className="text-[8px] font-mono opacity-60">[ CTL_PANEL ]</span>
+            </div>
             
             <button 
               onClick={() => setActiveTab('overview')}
               className={`
-                w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-extrabold transition-all duration-300 cursor-pointer group
+                w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer group relative overflow-hidden
                 ${activeTab === 'overview' 
-                  ? 'bg-blue-600/15 border border-blue-500/25 text-blue-400 shadow-[0_4px_20px_rgba(33,150,243,0.06)]' 
-                  : 'bg-transparent border border-transparent text-slate-400 hover:text-gray-100 hover:bg-white/[0.02]'
+                  ? 'bg-gradient-to-l from-blue-500/10 to-transparent border border-blue-500/20 text-blue-400 shadow-[inset_0_1px_1px_rgba(59,130,246,0.1),0_4px_12px_rgba(0,0,0,0.5)]' 
+                  : 'bg-transparent border border-transparent text-slate-400 hover:text-slate-100 hover:bg-white/[0.02] hover:border-white-[0.02]'
                 }
               `}
             >
+              {activeTab === 'overview' && (
+                <div className="absolute right-0 top-1.5 bottom-1.5 w-1 rounded-l-md bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)] animate-fade-in" />
+              )}
               <div className="flex items-center gap-3">
-                <Desktop className="w-4.5 h-4.5 shrink-0" weight={activeTab === 'overview' ? 'fill' : 'regular'} />
-                <span>میز کار کنترلی و ترافیک</span>
+                <Desktop 
+                  className={`w-5 h-5 shrink-0 transition-colors duration-200 ${activeTab === 'overview' ? 'text-blue-400' : 'text-slate-400 group-hover:text-slate-350'}`} 
+                  weight={activeTab === 'overview' ? 'fill' : 'regular'} 
+                />
+                <span className="tracking-tight text-[11.5px]">میز کار کنترلی و ترافیک</span>
               </div>
-              <span className="font-mono text-[10px] px-2 py-0.5 rounded-full bg-white/5 group-hover:bg-white/10 transition-colors">پیشخوان</span>
+              <span className={`text-[9.5px] font-bold px-2 py-0.5 rounded-md transition-all duration-200 ${
+                activeTab === 'overview' 
+                  ? 'bg-blue-500/10 text-blue-400 border border-blue-550/20' 
+                  : 'bg-white/5 text-slate-400 group-hover:bg-white/10 group-hover:text-slate-200'
+              }`}>پیشخوان</span>
             </button>
 
             <button 
               onClick={() => { setActiveTab('users'); setSelectedUserDetail(null); }}
               className={`
-                w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-extrabold transition-all duration-300 cursor-pointer group
+                w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer group relative overflow-hidden
                 ${activeTab === 'users' 
-                  ? 'bg-blue-600/15 border border-blue-500/25 text-blue-400 shadow-[0_4px_20px_rgba(33,150,243,0.06)]' 
-                  : 'bg-transparent border border-transparent text-slate-400 hover:text-gray-100 hover:bg-white/[0.02]'
+                  ? 'bg-gradient-to-l from-blue-500/10 to-transparent border border-blue-500/20 text-blue-400 shadow-[inset_0_1px_1px_rgba(59,130,246,0.1),0_4px_12px_rgba(0,0,0,0.5)]' 
+                  : 'bg-transparent border border-transparent text-slate-400 hover:text-slate-100 hover:bg-white/[0.02] hover:border-white-[0.02]'
                 }
               `}
             >
+              {activeTab === 'users' && (
+                <div className="absolute right-0 top-1.5 bottom-1.5 w-1 rounded-l-md bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)] animate-fade-in" />
+              )}
               <div className="flex items-center gap-3">
-                <Users className="w-4.5 h-4.5 shrink-0" weight={activeTab === 'users' ? 'fill' : 'regular'} />
-                <span>مدیریت پرسنل و دسترسی‌ها</span>
+                <Users 
+                  className={`w-5 h-5 shrink-0 transition-colors duration-200 ${activeTab === 'users' ? 'text-blue-400' : 'text-slate-400 group-hover:text-slate-350'}`} 
+                  weight={activeTab === 'users' ? 'fill' : 'regular'} 
+                />
+                <span className="tracking-tight text-[11.5px]">مدیریت پرسنل و دسترسی‌ها</span>
               </div>
-              <span className="font-mono text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-slate-300">{users.length}</span>
+              <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-slate-900/80 border border-white/5 text-slate-400 group-hover:text-slate-200 transition-colors">{users.length}</span>
             </button>
 
             <button 
               onClick={() => { setActiveTab('orgs'); setSelectedUserDetail(null); }}
               className={`
-                w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-extrabold transition-all duration-300 cursor-pointer group
+                w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer group relative overflow-hidden
                 ${activeTab === 'orgs' 
-                  ? 'bg-blue-600/15 border border-blue-500/25 text-blue-400 shadow-[0_4px_20px_rgba(33,150,243,0.06)]' 
-                  : 'bg-transparent border border-transparent text-slate-400 hover:text-gray-100 hover:bg-white/[0.02]'
+                  ? 'bg-gradient-to-l from-blue-500/10 to-transparent border border-blue-500/20 text-blue-400 shadow-[inset_0_1px_1px_rgba(59,130,246,0.1),0_4px_12px_rgba(0,0,0,0.5)]' 
+                  : 'bg-transparent border border-transparent text-slate-400 hover:text-slate-100 hover:bg-white/[0.02] hover:border-white-[0.02]'
                 }
               `}
             >
+              {activeTab === 'orgs' && (
+                <div className="absolute right-0 top-1.5 bottom-1.5 w-1 rounded-l-md bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)] animate-fade-in" />
+              )}
               <div className="flex items-center gap-3">
-                <Buildings className="w-4.5 h-4.5 shrink-0" weight={activeTab === 'orgs' ? 'fill' : 'regular'} />
-                <span>مدیریت سازمان‌ها و دامنه‌ها</span>
+                <Buildings 
+                  className={`w-5 h-5 shrink-0 transition-colors duration-200 ${activeTab === 'orgs' ? 'text-blue-400' : 'text-slate-400 group-hover:text-slate-350'}`} 
+                  weight={activeTab === 'orgs' ? 'fill' : 'regular'} 
+                />
+                <span className="tracking-tight text-[11.5px]">مدیریت سازمان‌ها و دامنه‌ها</span>
               </div>
-              <span className="font-mono text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-slate-300">{organizations.length}</span>
+              <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-slate-900/80 border border-white/5 text-slate-400 group-hover:text-slate-200 transition-colors">{organizations.length}</span>
             </button>
 
             <button 
               onClick={() => { setActiveTab('requests'); setSelectedUserDetail(null); }}
               className={`
-                w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-extrabold transition-all duration-300 cursor-pointer group relative
+                w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer group relative overflow-hidden
                 ${activeTab === 'requests' 
-                  ? 'bg-blue-600/15 border border-blue-500/25 text-blue-400 shadow-[0_4px_20px_rgba(33,150,243,0.06)]' 
-                  : 'bg-transparent border border-transparent text-slate-400 hover:text-gray-100 hover:bg-white/[0.02]'
+                  ? 'bg-gradient-to-l from-blue-500/10 to-transparent border border-blue-500/20 text-blue-400 shadow-[inset_0_1px_1px_rgba(59,130,246,0.1),0_4px_12px_rgba(0,0,0,0.5)]' 
+                  : 'bg-transparent border border-transparent text-slate-400 hover:text-slate-100 hover:bg-white/[0.02] hover:border-white-[0.02]'
                 }
               `}
             >
+              {activeTab === 'requests' && (
+                <div className="absolute right-0 top-1.5 bottom-1.5 w-1 rounded-l-md bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)] animate-fade-in" />
+              )}
               <div className="flex items-center gap-3">
-                <UserCheck className="w-4.5 h-4.5 shrink-0" weight={activeTab === 'requests' ? 'fill' : 'regular'} />
-                <span>صف درخواست‌های عضویت</span>
+                <UserCheck 
+                  className={`w-5 h-5 shrink-0 transition-colors duration-200 ${activeTab === 'requests' ? 'text-blue-400' : 'text-slate-400 group-hover:text-slate-350'}`} 
+                  weight={activeTab === 'requests' ? 'fill' : 'regular'} 
+                />
+                <span className="tracking-tight text-[11.5px]">صف درخواست‌های عضویت</span>
               </div>
               <div className="flex items-center gap-1.5">
-                {signupRequests.length > 0 && <span className="h-2 w-2 rounded-full bg-rose-550 animate-pulse" />}
-                <span className={`font-mono text-[10px] px-2 py-0.5 rounded-full ${signupRequests.length > 0 ? 'bg-rose-500/20 text-rose-400 font-black' : 'bg-white/5'}`}>{signupRequests.length}</span>
+                {signupRequests.length > 0 && <span className="h-1.5 w-1.5 rounded-full bg-rose-500 animate-pulse shadow-[0_0_6px_rgba(239,68,68,0.8)]" />}
+                <span className={`font-mono text-[10px] font-bold px-1.5 py-0.5 rounded-md transition-colors ${
+                  signupRequests.length > 0 
+                    ? 'bg-rose-500/10 text-rose-450 border border-rose-500/20 font-black' 
+                    : 'bg-slate-900/80 border border-white/5 text-slate-400 group-hover:text-slate-200'
+                }`}>{signupRequests.length}</span>
               </div>
             </button>
 
             <button 
               onClick={() => { setActiveTab('settings'); setSelectedUserDetail(null); }}
               className={`
-                w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-extrabold transition-all duration-300 cursor-pointer group
+                w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer group relative overflow-hidden
                 ${activeTab === 'settings' 
-                  ? 'bg-blue-600/15 border border-blue-500/25 text-blue-400 shadow-[0_4px_20px_rgba(33,150,243,0.06)]' 
-                  : 'bg-transparent border border-transparent text-slate-400 hover:text-gray-100 hover:bg-white/[0.02]'
+                  ? 'bg-gradient-to-l from-blue-500/10 to-transparent border border-blue-500/20 text-blue-400 shadow-[inset_0_1px_1px_rgba(59,130,246,0.1),0_4px_12px_rgba(0,0,0,0.5)]' 
+                  : 'bg-transparent border border-transparent text-slate-400 hover:text-slate-100 hover:bg-white/[0.02] hover:border-white-[0.02]'
                 }
               `}
             >
+              {activeTab === 'settings' && (
+                <div className="absolute right-0 top-1.5 bottom-1.5 w-1 rounded-l-md bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)] animate-fade-in" />
+              )}
               <div className="flex items-center gap-3">
-                <Sliders className="w-4.5 h-4.5 shrink-0" weight={activeTab === 'settings' ? 'fill' : 'regular'} />
-                <span>سیاست‌های امنیت و پروتکل</span>
+                <Sliders 
+                  className={`w-5 h-5 shrink-0 transition-colors duration-200 ${activeTab === 'settings' ? 'text-blue-400' : 'text-slate-400 group-hover:text-slate-350'}`} 
+                  weight={activeTab === 'settings' ? 'fill' : 'regular'} 
+                />
+                <span className="tracking-tight text-[11.5px]">سیاست‌های امنیت و پروتکل</span>
               </div>
-              <span className="font-mono text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-slate-300">امنیت</span>
+              <span className={`text-[9.5px] font-bold px-2 py-0.5 rounded-md transition-all duration-200 ${
+                activeTab === 'settings' 
+                  ? 'bg-blue-500/10 text-blue-400 border border-blue-550/20' 
+                  : 'bg-white/5 text-slate-400 group-hover:bg-white/10 group-hover:text-slate-200'
+              }`}>امنیت</span>
             </button>
           </nav>
 
         </div>
 
         {/* Sidebar Footer Controls */}
-        <div className="pt-6 border-t border-white/5 space-y-3.5 mt-8 md:mt-0">
-          <Button 
-            variant="outline" 
-            size="sm"
+        <div className="pt-5 border-t border-white/5 space-y-2.5 mt-8 md:mt-0">
+          <button 
             onClick={() => onChangeView(AppView.HOME)}
-            className="w-full justify-center gap-2 text-xs font-black border-white/5 hover:border-white/10 hover:bg-white/5 bg-transparent rounded-xl py-2.5 text-slate-300"
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/5 hover:border-white/10 bg-white/[0.02] hover:bg-white/[0.04] text-slate-300 text-[11.5px] font-bold transition-all relative hover:shadow-[0_4px_12px_rgba(0,0,0,0.3)] active:scale-[0.98] cursor-pointer"
           >
             <span>بازگشت به برنامه ویدئو</span>
-            <ArrowSquareOut className="w-4 h-4 text-blue-400" />
-          </Button>
+            <ArrowSquareOut className="w-4 h-4 text-blue-405 shrink-0 transition-transform group-hover:translate-x-0.5" />
+          </button>
 
           <button 
             onClick={onLogout}
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500 hover:text-white border border-rose-500/10 text-rose-450 text-xs font-black transition-all cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-transparent hover:bg-rose-500/10 text-[#afbac4] hover:text-rose-450 border border-transparent hover:border-rose-500/10 text-[11px] font-bold transition-all cursor-pointer active:scale-[0.98]"
           >
             <SignOut className="w-4 h-4 shrink-0" />
             <span>خروج از محیط مدیریت</span>
@@ -578,7 +665,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       </aside>
 
       {/* --- MAIN DASHBOARD CONTENT CONTAINER --- */}
-      <main className="flex-1 min-h-screen flex flex-col z-10 overflow-hidden relative">
+      <main className="flex-1 h-screen flex flex-col z-10 overflow-hidden relative">
         
         {/* TOP STATUS BAR */}
         <header className="h-20 border-b border-white/5 px-6 lg:px-10 flex items-center justify-between bg-[#07080e]/60 backdrop-blur-2xl">
@@ -623,15 +710,15 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         )}
 
         {/* DYNAMIC SCROLLABLE BODY */}
-        <section className="flex-1 p-6 lg:p-10 overflow-y-auto space-y-8">
+        <section className="flex-1 p-6 lg:p-10 overflow-y-auto flex flex-col">
           
           {/* ==================== VIEW 1: OVERVIEW ==================== */}
           {activeTab === 'overview' && (
-            <div className="space-y-8 animate-fade-in">
+            <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-8">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                 
                 {/* Metric 1 */}
-                <div className="bg-[#0f101b] border border-white/5 p-6 rounded-3xl relative overflow-hidden group">
+                <motion.div variants={itemVariants} className="bg-[#0f101b] border border-white/5 p-6 rounded-3xl relative overflow-hidden group">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-[11px] font-black tracking-wide text-slate-400">دژهای سازمانی</span>
                     <div className="p-2.5 bg-blue-500/10 text-blue-400 rounded-xl group-hover:scale-110 transition-transform">
@@ -642,10 +729,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     {organizations.length}
                   </div>
                   <span className="text-[10px] text-slate-400 font-bold block">سازمان مستقل و پورتال اختصاصی</span>
-                </div>
+                </motion.div>
 
                 {/* Metric 2 */}
-                <div className="bg-[#0f101b] border border-white/5 p-6 rounded-3xl relative overflow-hidden group">
+                <motion.div variants={itemVariants} className="bg-[#0f101b] border border-white/5 p-6 rounded-3xl relative overflow-hidden group">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-[11px] font-black tracking-wide text-slate-400">کل پرسنل متصل</span>
                     <div className="p-2.5 bg-sky-500/10 text-sky-400 rounded-xl group-hover:scale-110 transition-transform">
@@ -656,10 +743,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     {users.length}
                   </div>
                   <span className="text-[10px] text-slate-400 font-bold block">پروفایل پرسنلی رمزنگاری شده</span>
-                </div>
+                </motion.div>
 
                 {/* Metric 3 */}
-                <div className="bg-[#0f101b] border border-white/5 p-6 rounded-3xl relative overflow-hidden group">
+                <motion.div variants={itemVariants} className="bg-[#0f101b] border border-white/5 p-6 rounded-3xl relative overflow-hidden group">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-[11px] font-black tracking-wide text-slate-400">ساعات مکالمه امن</span>
                     <div className="p-2.5 bg-emerald-500/10 text-emerald-400 rounded-xl group-hover:scale-110 transition-transform">
@@ -670,10 +757,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     {users.reduce((acc, curr) => acc + curr.totalDurationHours, 0)} ساعت
                   </div>
                   <span className="text-[10px] text-slate-405 font-bold block">جلسات هماهنگ پلتفرم</span>
-                </div>
+                </motion.div>
 
                 {/* Metric 4 */}
-                <div className="bg-[#0f101b] border border-white/5 p-6 rounded-3xl relative overflow-hidden group">
+                <motion.div variants={itemVariants} className="bg-[#0f101b] border border-white/5 p-6 rounded-3xl relative overflow-hidden group">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-[11px] font-black tracking-wide text-slate-400">صف تایید هویت</span>
                     <div className="p-2.5 bg-rose-500/10 text-rose-455 rounded-xl group-hover:scale-110 transition-transform relative">
@@ -684,7 +771,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     {signupRequests.length}
                   </div>
                   <span className="text-[10px] text-slate-400 font-bold block">پرونده منتظر استعلام هویت</span>
-                </div>
+                </motion.div>
 
               </div>
 
@@ -692,7 +779,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
                 {/* Traffic Graph Card */}
-                <div className="bg-[#0c0d15]/60 border border-white/5 p-6 rounded-3xl lg:col-span-2 space-y-6">
+                <motion.div variants={itemVariants} className="bg-[#0c0d15]/60 border border-white/5 p-6 rounded-3xl lg:col-span-2 space-y-6">
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
                       <h3 className="text-sm font-black text-gray-200">نمودار زنده تبادل داده ویدئویی</h3>
@@ -842,10 +929,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                       <span className="text-xs font-bold text-amber-400 mt-1">۱۱.۲  میلی‌ثانیه / ۹۶٪ هشدار</span>
                     </div>
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Audit Security Log Feed */}
-                <div className="bg-[#0c0d15]/60 border border-white/5 p-6 rounded-3xl space-y-4 flex flex-col justify-between relative">
+                <motion.div variants={itemVariants} className="bg-[#0c0d15]/60 border border-white/5 p-6 rounded-3xl space-y-4 flex flex-col justify-between relative">
                   <div className="space-y-1">
                     <h3 className="text-sm font-black text-gray-200">وقایع امنیتی زنده سامانه</h3>
                     <p className="text-[10px] text-slate-400">رویدادها و دسترسی‌های اخیر مدیر فرکانس</p>
@@ -913,366 +1000,60 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     <Info className="w-3.5 h-3.5 animate-pulse text-blue-500" />
                     <span>آدرس IP ادمین ارشد ثبت و لاگ گردیده است. جهت بررسی جزییات، روی هر گزارش کلیک نمایید.</span>
                   </div>
-                </div>
+                </motion.div>
 
               </div>
-            </div>
+            </motion.div>
           )}
 
 
 
           {/* ==================== VIEW 2: STAFF & USERS ==================== */}
           {activeTab === 'users' && (
-            <div className="space-y-6 animate-fade-in">
-              
-              {/* Header with search and Add employee drawer action */}
-              <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-white/5 pb-5">
-                <div className="space-y-1 self-start">
-                  <h3 className="text-lg font-black text-gray-100">فهرست پرسنل و دسترسی‌های پرسرعت</h3>
-                  <p className="text-xs text-slate-400">تعریف کاربران جدید، لغو دسترسی‌های مشکوک، و پایش کارنامه تبادلات ویدئو</p>
-                </div>
-
-                <div className="flex items-center gap-3 w-full md:w-auto relative">
-                  <div className="relative w-full sm:w-64">
-                    <MagnifyingGlass className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                    <input 
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="جستجوی نام، دپارتمان یا سازمان..."
-                      className="w-full bg-[#0c0d15]/80 border border-white/5 rounded-2xl pr-10 pl-4 py-2 text-xs text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    />
-                  </div>
-
-                  <button 
-                    onClick={() => setShowAddUserForm(!showAddUserForm)}
-                    className="flex items-center gap-1.5 px-4.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 active:scale-95 text-white text-xs font-black transition-all cursor-pointer whitespace-nowrap shadow-lg shadow-blue-500/10"
-                  >
-                    <UserPlus className="w-4 h-4" />
-                    <span>{showAddUserForm ? 'بستن فرم ثبت' : 'ثبت کاربر جدید'}</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Collapsed Drawer / Form: Direct registration of personnel */}
-              {showAddUserForm && (
-                <div className="bg-[#0f101c] border border-blue-500/25 rounded-3xl p-6 shadow-xl space-y-6 animate-enter">
-                  <div className="flex items-center justify-between border-b border-white/5 pb-3">
-                    <div className="flex items-center gap-2">
-                      <UserPlus className="w-5 h-5 text-blue-400" />
-                      <h4 className="text-sm font-black text-white">ثبت‌نام مستقیم و تایید هویت پرسنل</h4>
-                    </div>
-                    <span className="text-[10px] text-slate-400 font-bold">ورود به پایگاه داده امن دید</span>
-                  </div>
-
-                  <form onSubmit={handleAddUser} className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-slate-400 block">نام و نام خانوادگی کارمند</label>
-                      <input 
-                        type="text" 
-                        value={newUserName}
-                        onChange={(e) => setNewUserName(e.target.value)}
-                        placeholder="مهندس علیرضا نیک‌زاد"
-                        className="w-full bg-[#07080e]/90 border border-white/5 rounded-xl px-3.5 py-2.5 text-xs text-gray-200 focus:ring-1 focus:ring-blue-500 focus:outline-none placeholder:text-slate-600"
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-slate-400 block">انتخاب سازمان مبدا</label>
-                      <select 
-                        value={newUserOrgId}
-                        onChange={(e) => setNewUserOrgId(e.target.value)}
-                        className="w-full bg-[#07080e]/90 border border-white/5 rounded-xl px-3.5 py-2.5 text-xs text-gray-200 focus:ring-1 focus:ring-blue-500 focus:outline-none cursor-pointer"
-                      >
-                        {organizations.map(org => (
-                          <option key={org.id} value={org.id} className="bg-slate-900 text-white">
-                            {org.name} ({org.code})
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-slate-400 block">سمت رسمی و رول سازمانی</label>
-                      <input 
-                        type="text" 
-                        value={newUserRole}
-                        onChange={(e) => setNewUserRole(e.target.value)}
-                        placeholder="سرپرست امنیت اطلاعات"
-                        className="w-full bg-[#07080e]/90 border border-white/5 rounded-xl px-3.5 py-2.5 text-xs text-gray-200 focus:ring-1 focus:ring-blue-500 focus:outline-none placeholder:text-slate-600"
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-slate-400 block">پست الکترونیک رسمی</label>
-                      <input 
-                        type="email" 
-                        value={newUserEmail}
-                        onChange={(e) => setNewUserEmail(e.target.value)}
-                        placeholder="alireza@did-voice.ir"
-                        className="w-full bg-[#07080e]/90 border border-white/5 rounded-xl px-3.5 py-2.5 text-xs text-gray-200 focus:ring-1 focus:ring-blue-500 focus:outline-none placeholder:text-slate-600 font-mono text-left"
-                        required
-                      />
-                    </div>
-
-                    <div className="md:col-span-2 flex justify-end gap-3 pt-2">
-                      <button 
-                        type="button" 
-                        onClick={() => setShowAddUserForm(false)}
-                        className="px-4 py-2.5 text-xs font-bold text-slate-400 hover:text-white transition-all cursor-pointer"
-                      >
-                        انصراف
-                      </button>
-                      <button 
-                        type="submit"
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all cursor-pointer shadow-md active:scale-95"
-                      >
-                        <UserPlus className="w-4 h-4" />
-                        <span>پیوست و ارتقاء دسترسی</span>
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              )}
-
-              {/* Main Employees Table */}
-              <div className="bg-[#0c0d15]/60 border border-white/5 rounded-3xl overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-right border-collapse">
-                    <thead>
-                      <tr className="border-b border-white/5 text-[10px] font-black text-slate-400 pb-3">
-                        <th className="p-4 py-3.5 text-right font-black">عنوان پرسنل</th>
-                        <th className="p-4 py-3.5 text-right font-black">سازمان تابعه و سمت</th>
-                        <th className="p-4 py-3.5 text-center font-black">تعداد مکالمه</th>
-                        <th className="p-4 py-3.5 text-center font-black">مجموع حضور</th>
-                        <th className="p-4 py-3.5 text-right font-black">آخرین فعالیت</th>
-                        <th className="p-4 py-3.5 text-center font-black">امضای امنیتی</th>
-                        <th className="p-4 py-3.5 text-left font-black">عملیات ادمین</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/[0.02]">
-                      {filteredUsers.length === 0 ? (
-                        <tr>
-                          <td colSpan={7} className="text-center py-12 text-xs text-slate-500 font-extrabold">
-                            موردی متناسب با دسته‌بندی یا جستجوی شما یافت نشد.
-                          </td>
-                        </tr>
-                      ) : (
-                        filteredUsers.map((user) => (
-                          <tr key={user.id} className="hover:bg-white/[0.01] transition-all group">
-                            
-                            <td className="p-4">
-                              <div className="flex items-center gap-3.5">
-                                <div className="w-9 h-9 rounded-xl bg-white/5 text-blue-400 border border-white/5 flex items-center justify-center font-black text-xs group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-500 transition-all duration-300">
-                                  {user.name.charAt(0)}
-                                </div>
-                                <div className="flex flex-col">
-                                  <span className="text-xs font-black text-gray-200 group-hover:text-white transition-colors">{user.name}</span>
-                                  <span className="text-[10px] text-slate-550 font-mono text-right mt-0.5">{user.email}</span>
-                                </div>
-                              </div>
-                            </td>
-
-                            <td className="p-4 text-xs font-bold text-slate-300">
-                              <div className="flex flex-col">
-                                <span>{user.orgName}</span>
-                                <span className="text-[9px] text-blue-400 font-extrabold mt-0.5">{user.role}</span>
-                              </div>
-                            </td>
-
-                            <td className="p-4 text-center text-xs font-mono font-black text-slate-300">
-                              {user.meetingsJoined} نشست
-                            </td>
-
-                            <td className="p-4 text-center text-xs font-mono font-black text-emerald-400">
-                              {user.totalDurationHours} ساعت
-                            </td>
-
-                            <td className="p-4 text-xs font-bold text-slate-400 font-mono">
-                              {user.lastActive}
-                            </td>
-
-                            <td className="p-4 text-center">
-                              <span className={`px-2 py-0.5 rounded-full text-[9px] font-black border tracking-wide inline-block ${
-                                user.status === 'active' 
-                                  ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' 
-                                  : 'bg-amber-500/10 border-amber-500/20 text-amber-400'
-                              }`}>
-                                {user.status === 'active' ? 'امضای معتبر' : 'کلاینت معلق'}
-                              </span>
-                            </td>
-
-                            <td className="p-4 text-left">
-                              <div className="flex items-center justify-end gap-2 text-left">
-                                <button 
-                                  onClick={() => setSelectedUserDetail(user)}
-                                  className="p-1 px-2.5 rounded-lg bg-blue-500/5 hover:bg-blue-500/15 text-[10px] font-black text-blue-400 border border-blue-500/10 transition-colors cursor-pointer"
-                                  title="بررسی وقایع کلاینت"
-                                >
-                                  مشاهده لاگ
-                                </button>
-                                <button 
-                                  onClick={() => handleDeleteUser(user.id, user.name, user.orgId)}
-                                  className="p-2 rounded-lg hover:bg-rose-500/10 text-rose-400 transition-colors border border-transparent hover:border-white/5"
-                                  title="تعلیق"
-                                >
-                                  <Trash className="w-3.5 h-3.5" />
-                                </button>
-                              </div>
-                            </td>
-
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              {/* Advanced telemetry stats for selected user client */}
-              {selectedUserDetail && (
-                <div className="bg-[#0b0c13] border border-blue-500/20 rounded-3xl p-6 shadow-xl space-y-4 animate-enter relative">
-                  <button 
-                    onClick={() => setSelectedUserDetail(null)}
-                    className="absolute left-6 top-6 text-[10px] font-black text-slate-500 hover:text-white transition-colors"
-                  >
-                    بستن گزارش [✕]
-                  </button>
-                  
-                  <div className="flex items-center gap-3.5">
-                    <div className="w-11 h-11 rounded-xl bg-blue-600 text-white flex items-center justify-center text-base font-black shadow-md shadow-blue-500/10">
-                      {selectedUserDetail.name.charAt(0)}
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-black text-white">ردگیری اتصالات امن کلاینت: {selectedUserDetail.name}</h4>
-                      <span className="text-[10px] text-blue-405 font-bold mt-1 block px-2.5 py-0.5 bg-blue-500/5 border border-blue-500/10 w-fit rounded-full">{selectedUserDetail.orgName} — {selectedUserDetail.role}</span>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-[#07080e] p-4 rounded-2xl border border-white/5">
-                    <div className="space-y-1">
-                      <span className="text-[10px] text-slate-500 font-extrabold block">امپدانس خط مکالمه (ضریب فانو)</span>
-                      <span className="text-xs font-black text-emerald-400 flex items-center gap-1.5">
-                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                        بدون تاخیر (۹۹.۸٪ پایداری انتقال بسته)
-                      </span>
-                    </div>
-                    
-                    <div className="space-y-1">
-                      <span className="text-[10px] text-slate-500 font-extrabold block">کدک فعال ویدئویی</span>
-                      <span className="text-xs font-bold text-gray-200">پروتکل SDP WebRTC VP9 Profile 2</span>
-                    </div>
-
-                    <div className="space-y-1">
-                      <span className="text-[10px] text-slate-500 font-extrabold block">حجم ترافیک تبادلی ماهانه</span>
-                      <span className="text-xs font-mono font-black text-blue-400">{(selectedUserDetail.totalDurationHours * 0.45).toFixed(2)} گیگابایت</span>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2 items-center text-[10px] text-slate-450 leading-relaxed">
-                    <Info className="w-4 h-4 text-blue-400 shrink-0" />
-                    <span>گواهی امنیتی این کاربر توسط مرجع رمزنگاری ستاد فناوری اطلاعات دید، معتبر و بدون ابهام ثبت شده است.</span>
-                  </div>
-                </div>
-              )}
-
-            </div>
+            <motion.div variants={containerVariants} initial="hidden" animate="visible" className="flex flex-col flex-1 space-y-6">
+              <UsersView
+                users={users}
+                organizations={organizations}
+                handleAddUser={handleAddUser}
+                handleDeleteUser={handleDeleteUser}
+                setSelectedUserDetail={setSelectedUserDetail}
+                filteredUsers={filteredUsers}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                showAddUserForm={showAddUserForm}
+                setShowAddUserForm={setShowAddUserForm}
+              />
+            </motion.div>
           )}
 
           {/* ==================== VIEW 3: ORGANIZATIONS ==================== */}
           {activeTab === 'orgs' && (
-            <div className="space-y-6 animate-fade-in">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-white/5 pb-5">
+            <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6">
+              <motion.div variants={itemVariants} className="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-white/5 pb-5">
                 <div className="space-y-1 self-start">
                   <h3 className="text-lg font-black text-gray-100">نهادها و سازمان‌های یکپارچه</h3>
                   <p className="text-xs text-slate-400">تخصیص دامنه‌های اینترانت، مدیریت ایمیل‌ها و سهمیه‌بندی اتاق‌های VIP</p>
                 </div>
 
                 <button 
-                  onClick={() => setShowAddOrgForm(!showAddOrgForm)}
-                  className="flex items-center gap-1.5 px-4.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-xs font-black transition-all cursor-pointer whitespace-nowrap shadow-lg shadow-emerald-500/10"
+                  onClick={() => setShowAddOrgForm(true)}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-xs font-black transition-all cursor-pointer whitespace-nowrap shadow-lg shadow-emerald-500/10"
                 >
                   <Plus className="w-4 h-4" />
-                  <span>{showAddOrgForm ? 'بستن فرم ایجاد سازمان' : 'ثبت نهاد جدید'}</span>
+                  <span>ثبت نهاد جدید</span>
                 </button>
-              </div>
+              </motion.div>
 
-              {/* Drawer for adding organisation */}
-              {showAddOrgForm && (
-                <div className="bg-[#0f101c] border border-emerald-500/25 rounded-3xl p-6 shadow-xl space-y-6 animate-enter">
-                  <div className="flex items-center justify-between border-b border-white/5 pb-3">
-                    <div className="flex items-center gap-2">
-                      <Plus className="w-5 h-5 text-emerald-400" />
-                      <h4 className="text-sm font-black text-white">ایجاد پرونده و شناسه سازمانی مستقل جدید</h4>
-                    </div>
-                    <span className="text-[10px] text-slate-400 font-bold">همگام‌سازی WebRTC دامنه</span>
-                  </div>
 
-                  <form onSubmit={handleAddOrganization} className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-slate-400 block">نام کامل سازمان / وزارتخانه</label>
-                      <input 
-                        type="text" 
-                        value={newOrgName}
-                        onChange={(e) => setNewOrgName(e.target.value)}
-                        placeholder="سازمان فضایی ایران"
-                        className="w-full bg-[#07080e]/90 border border-white/5 rounded-xl px-3.5 py-2.5 text-xs text-gray-200 focus:ring-1 focus:ring-blue-500 focus:outline-none placeholder:text-slate-600"
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-slate-400 block">شناسه اختصاری (یکتا)</label>
-                      <input 
-                        type="text" 
-                        value={newOrgCode}
-                        onChange={(e) => setNewOrgCode(e.target.value)}
-                        placeholder="ISA-GOV"
-                        className="w-full bg-[#07080e]/90 border border-white/5 rounded-xl px-3.5 py-2.5 text-xs text-gray-200 focus:ring-1 focus:ring-blue-500 focus:outline-none placeholder:text-slate-600 font-mono uppercase text-left"
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-black text-slate-400 block">دامنه اینترنتی مجاز ایمیل</label>
-                      <input 
-                        type="text" 
-                        value={newOrgDomain}
-                        onChange={(e) => setNewOrgDomain(e.target.value)}
-                        placeholder="isa.ir"
-                        className="w-full bg-[#07080e]/90 border border-white/5 rounded-xl px-3.5 py-2.5 text-xs text-gray-200 focus:ring-1 focus:ring-blue-500 focus:outline-none placeholder:text-slate-600 font-mono text-left"
-                        required
-                      />
-                    </div>
-
-                    <div className="md:col-span-3 flex justify-end gap-3 pt-2">
-                      <button 
-                        type="button" 
-                        onClick={() => setShowAddOrgForm(false)}
-                        className="px-4 py-2.5 text-xs font-bold text-slate-400 hover:text-white transition-all cursor-pointer"
-                      >
-                        انصراف
-                      </button>
-                      <button 
-                        type="submit"
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all cursor-pointer shadow-md active:scale-95"
-                      >
-                        <Plus className="w-4 h-4" />
-                        <span>ثبت رسمی لایسنس سازمان</span>
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              )}
 
               {/* Grid of registered organizations */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {organizations.map((org) => (
-                  <div 
+                  <motion.div 
                     key={org.id} 
-                    className="bg-[#0c0d15]/50 border border-white/5 rounded-3xl p-6 hover:border-blue-500/20 transition-all duration-300 relative group"
+                    variants={itemVariants}
+                    onClick={() => setSelectedOrgDetail(org)}
+                    className="bg-[#0c0d15]/50 border border-white/5 rounded-3xl p-6 hover:border-blue-500/30 hover:bg-[#111221]/40 transition-all duration-300 relative group cursor-pointer active:scale-[0.99] shadow-lg hover:shadow-blue-500/[0.03]"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3.5">
@@ -1280,14 +1061,17 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                           <Buildings className="w-5.5 h-5.5" />
                         </div>
                         <div>
-                          <h4 className="text-xs font-black text-gray-200 group-hover:text-white transition-colors">{org.name}</h4>
+                          <h4 className="text-xs font-black text-gray-200 group-hover:text-blue-400 transition-colors">{org.name}</h4>
                           <span className="text-[10px] text-blue-410 font-extrabold font-mono mt-0.5 block">کد دسترسی: {org.code}</span>
                         </div>
                       </div>
 
-                      <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-white/5 border border-white/5 text-slate-300">
-                        {org.userCount} کاربر فعال
-                      </span>
+                      <div className="flex flex-col items-end gap-1.5">
+                        <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-white/5 border border-white/5 text-slate-300">
+                          {org.userCount} کاربر فعال
+                        </span>
+                        <span className="text-[9px] text-slate-500 group-hover:text-blue-400 transition-colors font-bold uppercase tracking-wider">مشاهده پرونده ↗</span>
+                      </div>
                     </div>
 
                     <div className="mt-5 pt-4 border-t border-white/5 flex items-center justify-between text-xs">
@@ -1307,234 +1091,43 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                       <span className="text-slate-450">رمزنگاری داده‌ها:</span>
                       <span className="font-extrabold text-blue-400 text-[10px]">تونل مبادله کلید امن (ECDH)</span>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
 
-              <div className="p-4 rounded-xl bg-blue-500/5 border border-blue-500/10 text-blue-300 text-xs font-bold leading-relaxed flex items-center gap-2.5">
+              <motion.div variants={itemVariants} className="p-4 rounded-xl bg-blue-500/5 border border-blue-500/10 text-blue-300 text-xs font-bold leading-relaxed flex items-center gap-2.5">
                 <Info className="w-5 h-5 shrink-0 text-blue-400" />
                 <span>سازمان‌های سازگار با پلتفرم دید از طریق مجراهای چندگانه رمزنگاری با سرورهای مرکزی برقرار ارتباط می‌کنند.</span>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           )}
 
           {/* ==================== VIEW 4: SIGNUP REQUESTS ==================== */}
           {activeTab === 'requests' && (
-            <div className="space-y-6 animate-fade-in">
-              <div className="border-b border-white/5 pb-5">
+            <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6">
+              <motion.div variants={itemVariants} className="border-b border-white/5 pb-5">
                 <h3 className="text-lg font-black text-gray-100">بررسی صف فیلترینگ و استعلام صلاحیت</h3>
                 <p className="text-xs text-slate-400">تایید یا رد همگام‌سازی کلاینت، بررسی کدهای دسترسی و جلوگیری از نفوذ مخرب</p>
-              </div>
+              </motion.div>
 
-              {signupRequests.length === 0 ? (
-                <div className="py-20 text-center space-y-4 bg-[#0c0d15]/60 border border-white/5 rounded-3xl">
-                  <div className="p-4.5 bg-emerald-500/10 text-emerald-400 w-fit rounded-full mx-auto border border-emerald-500/20 shadow-sm shadow-emerald-500/10">
-                    <CheckCircle className="w-8 h-8 animate-bounce" weight="fill" />
-                  </div>
-                  <div className="space-y-1">
-                    <h4 className="text-sm font-black text-gray-200">صف پرونده‌ها کاملا خالی است!</h4>
-                    <p className="text-xs text-slate-500">تمامی درخواست‌های عضویت اخیر تایید صلاحیت یا به کلی آرشیو شده‌اند.</p>
-                  </div>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 gap-4.5">
-                  {signupRequests.map((req) => (
-                    <div 
-                      key={req.id} 
-                      className="bg-[#10111d] border border-white/5 rounded-3xl p-6 hover:border-slate-750 transition-all"
-                    >
-                      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                        
-                        <div className="space-y-3 flex-1">
-                          <div className="flex flex-wrap items-center gap-2.5">
-                            <span className="text-xs font-black text-gray-200 bg-white/5 px-3 py-1 rounded-xl border border-white/5">{req.name}</span>
-                            <span className="text-[10px] text-blue-400 font-extrabold px-2.5 py-0.5 bg-blue-550/10 border border-blue-500/15 rounded-full">{req.role}</span>
-                            <span className="text-[9px] text-slate-500 font-bold font-mono">ساعت وصول: {req.timestamp}</span>
-                          </div>
-
-                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-300">
-                            <div className="flex items-center gap-2">
-                              <Buildings className="w-4 h-4 text-slate-500" />
-                              <span>نهاد مورد درخواست: <strong className="font-extrabold text-slate-200">{req.requestedOrg}</strong></span>
-                            </div>
-                            <div className="flex items-center gap-2 font-mono">
-                              <EnvelopeSimple className="w-4 h-4 text-slate-500" />
-                              <span>{req.email}</span>
-                            </div>
-                            <div className="flex items-center gap-2 font-mono">
-                              <Phone className="w-4 h-4 text-slate-500" />
-                              <span>تلفن تماس پرونده: {req.phone}</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-3 self-end lg:self-center">
-                          <button 
-                            onClick={() => handleApproveRequest(req)}
-                            className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 active:scale-95 text-white text-xs font-black transition-all cursor-pointer shadow-md shadow-blue-500/10"
-                          >
-                            <CheckCircle className="w-4 h-4" weight="fill" />
-                            <span>تایید صلاحیت و ساخت امضای رسمی کلاینت</span>
-                          </button>
-                          
-                          <button 
-                            onClick={() => handleRejectRequest(req.id, req.name)}
-                            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-rose-500/20 hover:bg-rose-500/10 text-rose-400 text-xs font-extrabold cursor-pointer transition-all active:scale-95"
-                          >
-                            <XCircle className="w-4 h-4" weight="fill" />
-                            <span>رد درخواست</span>
-                          </button>
-                        </div>
-
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+              <RequestsView
+                signupRequests={signupRequests}
+                handleApproveRequest={handleApproveRequest}
+                handleRejectRequest={handleRejectRequest}
+              />
+            </motion.div>
           )}
 
           {/* ==================== VIEW 5: SECURITY POLICIES ==================== */}
           {activeTab === 'settings' && (
-            <div className="space-y-6 animate-fade-in">
-              <div className="border-b border-white/5 pb-5">
-                <h3 className="text-lg font-black text-gray-100">سیاست‌ها و پروتکل‌های امنیتی همفکری</h3>
-                <p className="text-xs text-slate-400">انتقال بسته‌ها در مجراهای چندگانه WebRTC، پیکربندی رمزگذاری و پدافند غیرعامل</p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                {/* Security Setting Box */}
-                <div className="bg-[#0c0d15]/60 border border-white/5 p-6 rounded-3xl space-y-6">
-                  
-                  <div className="flex items-center gap-3">
-                    <Lock className="w-5 h-5 text-blue-500" weight="fill" />
-                    <h4 className="text-sm font-black text-gray-250">خط‌مشی‌های هویتی و دسترسی کاربران</h4>
-                  </div>
-
-                  <div className="space-y-4">
-                    
-                    {/* Policy Toggle 1 */}
-                    <div className="flex items-center justify-between p-4 bg-white/[0.015] border border-white/5 rounded-2xl">
-                      <div className="space-y-1 pl-4">
-                        <span className="text-xs font-black text-gray-200 block">احراز هویت دو مرحله‌ای اجباری پرسنل</span>
-                        <p className="text-[10px] text-slate-450 leading-relaxed">ورود کلیه پرسنل سازمان‌ها پس از تایید OTP کد رسمی به سرور</p>
-                      </div>
-                      <button 
-                        onClick={() => togglePolicy('enforceMfa')}
-                        className={`w-12 h-6 rounded-full p-1 transition-all cursor-pointer ${policies.enforceMfa ? 'bg-blue-600 flex justify-end' : 'bg-slate-800 flex justify-start'}`}
-                      >
-                        <span className="w-4 h-4 rounded-full bg-white block shadow-md" />
-                      </button>
-                    </div>
-
-                    {/* Policy Toggle 2 */}
-                    <div className="flex items-center justify-between p-4 bg-white/[0.015] border border-white/5 rounded-2xl">
-                      <div className="space-y-1 pl-4">
-                        <span className="text-xs font-black text-gray-200 block">رمزنگاری سرتاسری پیشرفته ۲۵۶ بیتی</span>
-                        <p className="text-[10px] text-slate-450 leading-relaxed">کدگذاری چندمجزایی مکالمات روی کلاینت‌ها همگام با فناوری WebRTC</p>
-                      </div>
-                      <button 
-                        onClick={() => togglePolicy('strictE2EE')}
-                        className={`w-12 h-6 rounded-full p-1 transition-all cursor-pointer ${policies.strictE2EE ? 'bg-blue-600 flex justify-end' : 'bg-slate-800 flex justify-start'}`}
-                      >
-                        <span className="w-4 h-4 rounded-full bg-white block shadow-md" />
-                      </button>
-                    </div>
-
-                    {/* Policy Toggle 3 */}
-                    <div className="flex items-center justify-between p-4 bg-white/[0.015] border border-white/5 rounded-2xl">
-                      <div className="space-y-1 pl-4">
-                        <span className="text-xs font-black text-gray-200 block">ثبت لاگ‌های آدرس آی‌پی اتصالات</span>
-                        <p className="text-[10px] text-slate-450 leading-relaxed">ثبت لوکیشن و نشانی IP اتصالات در پرونده بررسی وقایع امنیتی</p>
-                      </div>
-                      <button 
-                        onClick={() => togglePolicy('ipLogging')}
-                        className={`w-12 h-6 rounded-full p-1 transition-all cursor-pointer ${policies.ipLogging ? 'bg-blue-600 flex justify-end' : 'bg-slate-800 flex justify-start'}`}
-                      >
-                        <span className="w-4 h-4 rounded-full bg-white block shadow-md" />
-                      </button>
-                    </div>
-
-                  </div>
-
-                </div>
-
-                {/* Sub-system and Bandwidth Parameters */}
-                <div className="bg-[#0c0d15]/60 border border-white/5 p-6 rounded-3xl space-y-6">
-                  
-                  <div className="flex items-center gap-3">
-                    <WifiHigh className="w-5 h-5 text-emerald-400" weight="fill" />
-                    <h4 className="text-sm font-black text-gray-250">تنظیمات ترافیک شبکه و کدک همایش‌ها</h4>
-                  </div>
-
-                  <div className="space-y-4">
-                    
-                    {/* Option Selection Panel */}
-                    <div className="space-y-2 p-1 pt-0">
-                      <span className="text-xs font-black text-slate-400 block mb-2">کیفیت پیش‌فرض ارسال داده‌های استریم ویدئویی</span>
-                      
-                      <div className="grid grid-cols-3 gap-3">
-                        {['720p', '1080p', '4k'].map((q) => (
-                          <button 
-                            key={q}
-                            onClick={() => setQuality(q)}
-                            className={`py-3.5 rounded-xl border text-xs font-extrabold transition-all cursor-pointer ${
-                              policies.streamQuality === q 
-                                ? 'bg-blue-600/15 border-blue-500 text-blue-400 shadow-md' 
-                                : 'bg-white/[0.01] border-white/5 text-slate-400 hover:text-white hover:bg-white/5'
-                            }`}
-                          >
-                            {q === '720p' && '۷۲۰p (کاهش پهنا)'}
-                            {q === '1080p' && '۱۰۸۰p (کیفیت استاندارد)'}
-                            {q === '4k' && '۴K (کیفیت فوق ویژه)'}
-                          </button>
-                        ))}
-                      </div>
-
-                      <p className="text-[10px] text-slate-500 leading-relaxed mt-2.5">
-                        رزولوشن انتخابی متناسب با شتاب‌دهنده گرافیکی کارت شبکه و پهنای باند گمرک ابری هر ستاد اعمال می‌شود.
-                      </p>
-                    </div>
-
-                    {/* Policy Toggle 4 */}
-                    <div className="flex items-center justify-between p-4 bg-white/[0.015] border border-white/5 rounded-2xl">
-                      <div className="space-y-1 pl-4">
-                        <span className="text-xs font-black text-gray-200 block">ضبط تصاویر اتوماتیک کدهای VIP</span>
-                        <p className="text-[10px] text-slate-450 leading-relaxed">دخیره‌سازی فایل مکالمه همایش‌های کلیدی دولتی در سرور ذخیره‌ای ایزوله</p>
-                      </div>
-                      <button 
-                        onClick={() => togglePolicy('autoRecordVip')}
-                        className={`w-12 h-6 rounded-full p-1 transition-all cursor-pointer ${policies.autoRecordVip ? 'bg-blue-600 flex justify-end' : 'bg-slate-800 flex justify-start'}`}
-                      >
-                        <span className="w-4 h-4 rounded-full bg-white block shadow-md" />
-                      </button>
-                    </div>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-              <div className="p-5.5 rounded-2.5xl bg-zinc-900/40 border border-white/5 space-y-3">
-                <span className="text-xs font-black text-emerald-400 flex items-center gap-2">
-                  <ShieldCheck className="w-5 h-5 text-emerald-400" weight="fill" />
-                  وضعیت تطبیق با استانداردهای پدافند غیرعامل (سطح ب)
-                </span>
-                <p className="text-[11px] text-slate-400 leading-relaxed">
-                  تنظیمات فوق بر تمامی دامنه‌ها و سیستم جلسات ستادی طرف قرارداد سامانه رمزگذاری مکالمه دید حاکم بوده و تحت نظارت مرجع امنیت بستر داده‌های ملی پایش می‌شود.
-                </p>
-              </div>
-
-            </div>
+            <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6">
+              <SettingsView 
+                policies={policies}
+                togglePolicy={togglePolicy}
+                setQuality={setQuality}
+              />
+            </motion.div>
           )}
-
-          {/* Bottom Branding Stamp */}
-          <footer className="pt-6 border-t border-white/5 text-center text-[10px] text-slate-550 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <span>حقوق مادی و معنوی پنل نظارت دید متعلق به پورتال هماهنگ ویدیو کنفرانس ستاد کل می‌باشد.</span>
-            <span className="tracking-widest text-blue-400 font-bold bg-blue-500/5 px-3 py-1 rounded-lg border border-blue-500/10 dark:border-white/5">بستر رمزگذاری شده امن - نسخه ۲.۸</span>
-          </footer>
 
         </section>
 
@@ -1664,6 +1257,443 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 تایید و بازگشت
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==================== USER DETAIL POPUP MODAL ==================== */}
+      {selectedUserDetail && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-black/90 backdrop-blur-lg animate-fade-in" 
+          onClick={() => setSelectedUserDetail(null)}
+        >
+          <div 
+            className="bg-[#0b0c15] rounded-[2.5rem] border border-white/10 border-t-4 border-t-blue-500 max-w-2xl w-full p-10 md:p-12 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9),inset_0_1px_2px_rgba(255,255,255,0.05)] relative select-none rtl text-right flex flex-col space-y-8 overflow-hidden max-h-[92vh] animate-scale-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header Block */}
+            <div className="flex items-center justify-between border-b border-white/5 pb-6">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center justify-center font-black text-xl shadow-inner shrink-0">
+                  {selectedUserDetail.name.charAt(0)}
+                </div>
+                <div className="space-y-1.5">
+                  <h4 className="text-base font-black text-slate-105 flex items-center gap-2.5">
+                    <span>{selectedUserDetail.name}</span>
+                    <span className="text-[10px] text-blue-450 font-mono tracking-wider bg-slate-900 border border-white/5 px-2.5 py-0.5 rounded-full select-all">
+                      {selectedUserDetail.id}
+                    </span>
+                  </h4>
+                  <p className="text-xs text-slate-400 font-medium">
+                    پست الکترونیک: <span className="font-mono text-slate-205 select-all">{selectedUserDetail.email}</span>
+                  </p>
+                </div>
+              </div>
+              
+              <button 
+                onClick={() => setSelectedUserDetail(null)}
+                className="p-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 text-slate-400 hover:text-white transition-all duration-200 active:scale-90 cursor-pointer shrink-0"
+                title="بستن"
+              >
+                <XCircle className="w-6 h-6" />
+              </button>
+            </div>
+
+            {/* Personnel Specifications / Meta information */}
+            <div className="bg-[#12131e]/30 p-6 rounded-[2rem] border border-white/5 space-y-4">
+              <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">سازمان تابعه و رول سازمانی</div>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-1.5">
+                  <span className="text-[10px] text-slate-400 block">عنوان نهاد حاکمیتی</span>
+                  <span className="text-sm font-bold text-gray-200 leading-relaxed block">{selectedUserDetail.orgName}</span>
+                </div>
+                <div className="space-y-1.5 border-r border-white/5 pr-6">
+                  <span className="text-[10px] text-slate-400 block">سمت رسمی پرسنل</span>
+                  <span className="text-sm font-bold text-blue-400 leading-relaxed block">{selectedUserDetail.role}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Detailed Analytics Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="bg-[#12131e]/50 p-5 rounded-2xl border border-white/5 flex flex-col justify-between font-sans min-h-[96px]">
+                <span className="text-[10px] text-slate-500 tracking-wider font-bold">نشست‌های متصل</span>
+                <span className="text-slate-100 font-black text-lg mt-2">{selectedUserDetail.meetingsJoined} جلسه</span>
+              </div>
+              <div className="bg-[#12131e]/50 p-5 rounded-2xl border border-white/5 flex flex-col justify-between font-sans min-h-[96px]">
+                <span className="text-[10px] text-slate-500 tracking-wider font-bold">مجموع مدت حضور</span>
+                <span className="text-slate-100 font-black text-lg mt-2 font-mono">{selectedUserDetail.totalDurationHours} ساعت</span>
+              </div>
+              <div className="bg-[#12131e]/50 p-5 rounded-2xl border border-white/5 flex flex-col justify-between font-sans min-h-[96px]">
+                <span className="text-[10px] text-slate-500 tracking-wider font-bold">آخرین فعالیت فعال</span>
+                <span className="text-slate-100 font-bold text-xs mt-3 select-all">{selectedUserDetail.lastActive}</span>
+              </div>
+            </div>
+
+            {/* Modal Actions Footer */}
+            <div className="border-t border-white/5 pt-6 flex justify-end gap-3.5">
+              <button 
+                type="button" 
+                onClick={() => setSelectedUserDetail(null)}
+                className="px-6 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-black active:scale-95 transition-all cursor-pointer"
+              >
+                بستن پنجره جزئیات
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==================== ORGANIZATION DETAIL POPUP MODAL ==================== */}
+      {selectedOrgDetail && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-black/90 backdrop-blur-lg animate-fade-in" 
+          onClick={() => setSelectedOrgDetail(null)}
+        >
+          <div 
+            className="bg-[#0b0c15] rounded-[3rem] border border-white/10 border-t-2 border-t-blue-500 max-w-xl w-full p-8 shadow-2xl relative select-none rtl text-right flex flex-col space-y-6 overflow-hidden max-h-[92vh] animate-scale-in shadow-[0_20px_50px_-12px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(59,130,246,0.15)] modal-scrollbar overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header Block */}
+            <div className="flex items-center justify-between border-b border-white/5 pb-6">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center justify-center font-black text-xl shadow-inner shrink-0">
+                  <Buildings className="w-7 h-7" />
+                </div>
+                <div className="space-y-1.5 flex-1">
+                  <h4 className="text-base font-black text-slate-100 flex items-center gap-2.5 flex-wrap">
+                    <span>{selectedOrgDetail.name}</span>
+                    <span className="text-[10px] text-blue-400 font-mono tracking-wider bg-slate-900 border border-white/5 px-2.5 py-0.5 rounded-full select-all">
+                      {selectedOrgDetail.code}
+                    </span>
+                  </h4>
+                  <p className="text-xs text-slate-400 font-medium">
+                    دامنه مجاز پسوند ایمیل رسمی: <span className="font-mono text-blue-400 select-all font-bold">@{selectedOrgDetail.domain}</span>
+                  </p>
+                </div>
+              </div>
+              
+              <button 
+                type="button"
+                onClick={() => setSelectedOrgDetail(null)}
+                className="p-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 text-slate-400 hover:text-white transition-all duration-200 active:scale-90 cursor-pointer shrink-0"
+                title="بستن"
+              >
+                <XCircle className="w-6 h-6" />
+              </button>
+            </div>
+
+            {/* Technical Configuration Overview */}
+            <div className="bg-[#12131e]/30 p-6 rounded-[2rem] border border-white/5 space-y-4">
+              <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">سیاست‌های دسترسی و تخصیص سهمیه رسانه</div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div className="space-y-1">
+                  <span className="text-[10px] text-slate-400 block">مجرا و سرور استقرار</span>
+                  <span className="text-xs font-black text-white leading-relaxed block">ابر توزیع‌شده ملی (دید-آی‌تی‌سی)</span>
+                </div>
+                <div className="space-y-1 border-r border-white/5 pr-4">
+                  <span className="text-[10px] text-slate-400 block">سطح امنیت کانال‌های صوتی</span>
+                  <span className="text-xs font-black text-blue-400 leading-relaxed block">دفاع فدرال چندلایه (E2EE)</span>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-[10px] text-slate-400 block">رمزگذاری ضبط جلسات حساس</span>
+                  <span className="text-xs font-black text-emerald-400 leading-relaxed block">الگوریتم رمزنگاری AES-256-Bit</span>
+                </div>
+                <div className="space-y-1 border-r border-white/5 pr-4">
+                  <span className="text-[10px] text-slate-400 block">حداکثر ظرفیت همزمان</span>
+                  <span className="text-xs font-black text-amber-500 leading-relaxed block">۱,۰۰۰ کلاینت در هر وب‌نشست</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Detailed Analytics Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="bg-[#12131e]/50 p-5 rounded-2xl border border-white/5 flex flex-col justify-between font-sans min-h-[96px]">
+                <span className="text-[10px] text-slate-500 tracking-wider font-bold">تعداد کاربران فعال</span>
+                <span className="text-slate-100 font-black text-lg mt-2">{selectedOrgDetail.userCount} نفر</span>
+              </div>
+              <div className="bg-[#12131e]/50 p-5 rounded-2xl border border-white/5 flex flex-col justify-between font-sans min-h-[96px]">
+                <span className="text-[10px] text-slate-500 tracking-wider font-bold">سهمیه ذخیره ابری</span>
+                <span className="text-slate-100 font-black text-sm mt-3 font-mono">۱۰ ترابایت ویژه</span>
+              </div>
+              <div className="bg-[#12131e]/50 p-5 rounded-2xl border border-white/5 flex flex-col justify-between font-sans min-h-[96px]">
+                <span className="text-[10px] text-slate-500 tracking-wider font-bold">اتصالات یکپارچه</span>
+                <span className="text-emerald-400 font-bold text-xs mt-3 select-all">۱۰۰٪ فعال و پایدار</span>
+              </div>
+            </div>
+
+            {/* Security Audit Trail Notice */}
+            <div className="bg-[#0e1017] p-5 rounded-2xl border border-white/5 text-right space-y-2">
+              <div className="flex items-center gap-2 text-blue-400">
+                <ShieldCheck className="w-4 h-4 shrink-0" />
+                <span className="text-[10px] font-black uppercase">اطلاعیه حفاظتی و استانداردهای ارتباطی پلتفرم دید</span>
+              </div>
+              <p className="text-[10.5px] text-slate-400 leading-relaxed font-sans font-medium text-justify">
+                این پرونده متعلق به <span className="text-slate-200 font-bold">{selectedOrgDetail.name}</span> می‌باشد. تمامی وب‌نشست‌ها، ترافیک صوتی و تصویری ورودی و خروجی از دامنه‌ی مجاز <span className="font-mono text-teal-400 font-bold font-black">@{selectedOrgDetail.domain}</span> تحت بسترهای رمزنگاری‌شده فدرال و مطابق به آیین‌نامه‌های پدافند غیرعامل تبادل می‌گردند.
+              </p>
+            </div>
+
+            {/* Modal Actions Footer */}
+            <div className="border-t border-white/5 pt-6 flex justify-end gap-3.5">
+              <button 
+                type="button" 
+                onClick={() => setSelectedOrgDetail(null)}
+                className="px-6 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-black active:scale-95 transition-all cursor-pointer"
+              >
+                بستن پنجره جزئیات
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==================== CREATE USER POPUP MODAL ==================== */}
+      {showAddUserForm && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-black/90 backdrop-blur-lg animate-fade-in"
+          onClick={() => {
+            setShowAddUserForm(false);
+            setNewUserName('');
+            setNewUserRole('');
+            setNewUserEmail('');
+          }}
+        >
+          <div 
+            className="bg-[#0b0c15] rounded-[2.5rem] border border-white/10 border-t-4 border-t-blue-500 max-w-2xl w-full p-10 md:p-12 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9),inset_0_1px_2px_rgba(255,255,255,0.05)] relative select-none rtl text-right flex flex-col space-y-8 overflow-hidden max-h-[92vh] animate-scale-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header Block Description */}
+            <div className="flex items-center justify-between border-b border-white/5 pb-6">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center justify-center font-black text-xl shadow-inner shrink-0">
+                  <UserPlus className="w-6 h-6" />
+                </div>
+                <div className="space-y-1.5 text-right align-right">
+                  <h4 className="text-base font-black text-slate-100">ثبت‌نام مستقیم و تایید هویت پرسنل</h4>
+                  <p className="text-xs text-slate-400 font-medium text-right">
+                    ورود به پایگاه داده امن دید و تخصیص سطوح دسترسی
+                  </p>
+                </div>
+              </div>
+              
+              <button 
+                type="button"
+                onClick={() => {
+                  setShowAddUserForm(false);
+                  setNewUserName('');
+                  setNewUserRole('');
+                  setNewUserEmail('');
+                }}
+                className="p-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 text-slate-400 hover:text-white transition-all duration-200 active:scale-90 cursor-pointer shrink-0"
+                title="بستن"
+              >
+                <XCircle className="w-6 h-6" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddUser} className="flex flex-col space-y-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-7 gap-x-6">
+                <div className="space-y-2.5 text-right align-right">
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-wider block">نام و نام خانوادگی کارمند</label>
+                  <input 
+                    type="text" 
+                    value={newUserName}
+                    onChange={(e) => setNewUserName(e.target.value)}
+                    placeholder="مهندس علیرضا نیک‌زاد"
+                    className="w-full bg-[#07080e]/95 border border-white/10 rounded-xl px-4 py-3 text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:outline-none placeholder:text-slate-600 focus:border-blue-500 transition-all font-sans"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2.5 text-right align-right">
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-wider block">انتخاب سازمان مبدا</label>
+                  <select 
+                    value={newUserOrgId}
+                    onChange={(e) => setNewUserOrgId(e.target.value)}
+                    className="w-full bg-[#07080e]/95 border border-white/10 rounded-xl px-4 py-3 text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:outline-none cursor-pointer focus:border-blue-500 transition-all"
+                    required
+                  >
+                    <option value="" className="bg-slate-900 text-slate-400">لطفا انتخاب کنید...</option>
+                    {organizations.map(org => (
+                      <option key={org.id} value={org.id} className="bg-slate-900 text-white">
+                        {org.name} ({org.code})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-2.5 text-right align-right">
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-wider block">سمت رسمی و رول سازمانی</label>
+                  <input 
+                    type="text" 
+                    value={newUserRole}
+                    onChange={(e) => setNewUserRole(e.target.value)}
+                    placeholder="سرپرست امنیت اطلاعات"
+                    className="w-full bg-[#07080e]/95 border border-white/10 rounded-xl px-4 py-3 text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:outline-none placeholder:text-slate-600 focus:border-blue-500 transition-all font-sans"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2.5 text-right align-right">
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-wider block">پست الکترونیک رسمی</label>
+                  <input 
+                    type="email" 
+                    value={newUserEmail}
+                    onChange={(e) => setNewUserEmail(e.target.value)}
+                    placeholder="alireza@did-voice.ir"
+                    className="w-full bg-[#07080e]/95 border border-white/10 rounded-xl px-4 py-3 text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:outline-none placeholder:text-slate-600 font-mono text-left focus:border-blue-500 transition-all"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Notice / Policy guideline */}
+              <div className="bg-[#12131e]/50 p-5 rounded-2xl border border-white/5 text-right">
+                <p className="text-[10px] text-slate-400 leading-relaxed font-sans font-medium text-justify">
+                  * پس از ثبت مشخصات کاربر جدید در دایرکتوری دید، یک کلید عمومی منحصربه‌فرد با استاندارد رمزنگاری <span className="font-mono text-xs text-teal-400">ECDSA-SHA384</span> به صورت خودکار تخصیص یافته و پروانه امضای دیجیتال کاربر فعال خواهد شد.
+                </p>
+              </div>
+
+              {/* Actions Footer */}
+              <div className="border-t border-white/5 pt-6 flex justify-end gap-3.5">
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    setShowAddUserForm(false);
+                    setNewUserName('');
+                    setNewUserRole('');
+                    setNewUserEmail('');
+                  }}
+                  className="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-black active:scale-95 transition-all cursor-pointer"
+                >
+                  انصراف و لغو پرونده
+                </button>
+                <button 
+                  type="submit"
+                  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-black transition-all cursor-pointer shadow-lg shadow-blue-500/10 active:scale-95"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  <span>پیوست و ارتقاء دسترسی</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ==================== CREATE ORGANIZATION POPUP MODAL ==================== */}
+      {showAddOrgForm && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-black/95 backdrop-blur-lg animate-fade-in"
+          onClick={() => {
+            setShowAddOrgForm(false);
+            setNewOrgName('');
+            setNewOrgCode('');
+            setNewOrgDomain('');
+          }}
+        >
+          <div 
+            className="bg-[#0b0c15] rounded-[2.5rem] border border-white/10 border-t-4 border-t-emerald-500 max-w-2xl w-full p-10 md:p-12 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9),inset_0_1px_2px_rgba(255,255,255,0.05)] relative select-none rtl text-right flex flex-col space-y-8 overflow-hidden max-h-[92vh] animate-scale-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header Block Description */}
+            <div className="flex items-center justify-between border-b border-white/5 pb-6">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center font-black text-xl shadow-inner shrink-0">
+                  <Buildings className="w-6 h-6" />
+                </div>
+                <div className="space-y-1.5 text-right align-right">
+                  <h4 className="text-base font-black text-slate-100 font-sans">ایجاد پرونده و شناسه سازمانی مستقل جدید</h4>
+                  <p className="text-xs text-slate-400 font-medium text-right font-sans">
+                    همگام‌سازی ترافیک انتساب دامنه‌ها، دایرکتوری ایمیل و احراز اصالت WebRTC
+                  </p>
+                </div>
+              </div>
+              
+              <button 
+                type="button"
+                onClick={() => {
+                  setShowAddOrgForm(false);
+                  setNewOrgName('');
+                  setNewOrgCode('');
+                  setNewOrgDomain('');
+                }}
+                className="p-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 text-slate-400 hover:text-white transition-all duration-200 active:scale-90 cursor-pointer shrink-0"
+                title="بستن"
+              >
+                <XCircle className="w-6 h-6" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddOrganization} className="flex flex-col space-y-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-7 gap-x-6">
+                <div className="space-y-2.5 sm:col-span-2 text-right align-right">
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-wider block font-sans">نام کامل سازمان / وزارتخانه</label>
+                  <input 
+                    type="text" 
+                    value={newOrgName}
+                    onChange={(e) => setNewOrgName(e.target.value)}
+                    placeholder="سازمان فضایی ایران یا وزارت ارتباطات"
+                    className="w-full bg-[#07080e]/95 border border-white/10 rounded-xl px-4 py-3 text-xs text-slate-200 focus:ring-1 focus:ring-emerald-500 focus:outline-none placeholder:text-slate-600 focus:border-emerald-500 transition-all font-sans"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2.5 text-right align-right">
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-wider block font-sans">شناسه اختصاری سازمان (یکتا)</label>
+                  <input 
+                    type="text" 
+                    value={newOrgCode}
+                    onChange={(e) => setNewOrgCode(e.target.value)}
+                    placeholder="ISA-GOV"
+                    className="w-full bg-[#07080e]/95 border border-white/10 rounded-xl px-4 py-3 text-xs text-slate-200 focus:ring-1 focus:ring-emerald-500 focus:outline-none placeholder:text-slate-600 font-mono uppercase text-left focus:border-emerald-500 transition-all"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2.5 text-right align-right">
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-wider block font-sans">دامنه اینترنتی مجاز ایمیل (Domain)</label>
+                  <input 
+                    type="text" 
+                    value={newOrgDomain}
+                    onChange={(e) => setNewOrgDomain(e.target.value)}
+                    placeholder="isa.ir"
+                    className="w-full bg-[#07080e]/95 border border-white/10 rounded-xl px-4 py-3 text-xs text-slate-200 focus:ring-1 focus:ring-emerald-500 focus:outline-none placeholder:text-slate-600 font-mono text-left focus:border-emerald-500 transition-all"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Notice / Policy guideline */}
+              <div className="bg-[#12131e]/50 p-5 rounded-2xl border border-white/5 text-right">
+                <p className="text-[10px] text-slate-400 leading-relaxed font-sans font-medium text-justify">
+                  * پس از تایید هویت دامنه فعال‌سازی، پروتکل‌های رمزنگاری لایه انتقال صوتی-تصویری سازمان در گیت‌وی دید ثبت مستمر شده و دامنه‌های فرعی متناظر با اولویت امنیتی تفکیک می‌شوند.
+                </p>
+              </div>
+
+              {/* Actions Footer */}
+              <div className="border-t border-white/5 pt-6 flex justify-end gap-3.5">
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    setShowAddOrgForm(false);
+                    setNewOrgName('');
+                    setNewOrgCode('');
+                    setNewOrgDomain('');
+                  }}
+                  className="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-black active:scale-95 transition-all cursor-pointer"
+                >
+                  انصراف و لغو پرونده
+                </button>
+                <button 
+                  type="submit"
+                  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black transition-all cursor-pointer shadow-lg shadow-emerald-500/10 active:scale-95"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>ثبت رسمی لایسنس سازمان</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
