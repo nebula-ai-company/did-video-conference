@@ -8,10 +8,18 @@ import { Signup } from './views/Signup';
 import { Settings } from './views/Settings';
 import { AdminLogin } from './views/AdminLogin';
 import { AdminPanel } from './views/AdminPanel';
+import { Landing } from './views/Landing';
+import { LandingFeatures } from './views/LandingFeatures';
+import { LandingSecurity } from './views/LandingSecurity';
+import { LandingContact } from './views/LandingContact';
 import { AppView, UserSettings } from './types';
 
 const App: React.FC = () => {
-  const [currentView, setCurrentView] = useState<AppView>(AppView.LOGIN);
+  // Check for deep-link ?room= param on initial load
+  const [currentView, setCurrentView] = useState<AppView>(() => {
+    const urlParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+    return urlParams.has('room') ? AppView.LOGIN : AppView.LANDING;
+  });
   const [meetingId, setMeetingId] = useState<string>('');
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
@@ -41,7 +49,7 @@ const App: React.FC = () => {
   const handleLogout = () => {
     setIsAuthenticated(false);
     setUserSettings(prev => ({ ...prev, displayName: 'کاربر مهمان' }));
-    setCurrentView(AppView.LOGIN);
+    setCurrentView(AppView.LANDING);
   };
 
   const handleAdminLogin = () => {
@@ -64,9 +72,67 @@ const App: React.FC = () => {
     }
   }, [userSettings.theme]);
 
+  // Post-auth-resolution effect
+  useEffect(() => {
+    const urlParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+    const hasRoom = urlParams.has('room');
+    if (!isAuthenticated && !isAdmin) {
+      if (hasRoom) {
+        if (currentView !== AppView.LOGIN && currentView !== AppView.SIGNUP) {
+          setCurrentView(AppView.LOGIN);
+        }
+      } else {
+        const publicViews = [
+          AppView.LANDING,
+          AppView.LANDING_FEATURES,
+          AppView.LANDING_SECURITY,
+          AppView.LANDING_CONTACT,
+          AppView.LOGIN,
+          AppView.SIGNUP,
+          AppView.ADMIN_LOGIN
+        ];
+        if (!publicViews.includes(currentView)) {
+          setCurrentView(AppView.LANDING);
+        }
+      }
+    }
+  }, [isAuthenticated, isAdmin, currentView]);
+
   // View Router
   const renderView = () => {
     switch (currentView) {
+      case AppView.LANDING:
+        return (
+          <Landing 
+            onChangeView={setCurrentView}
+            userSettings={userSettings}
+            updateSettings={updateSettings}
+          />
+        );
+      case AppView.LANDING_FEATURES:
+        return (
+          <LandingFeatures 
+            onChangeView={setCurrentView}
+            userSettings={userSettings}
+            updateSettings={updateSettings}
+          />
+        );
+      case AppView.LANDING_SECURITY:
+        return (
+          <LandingSecurity 
+            onChangeView={setCurrentView}
+            userSettings={userSettings}
+            updateSettings={updateSettings}
+          />
+        );
+      case AppView.LANDING_CONTACT:
+        return (
+          <LandingContact 
+            onChangeView={setCurrentView}
+            userSettings={userSettings}
+            updateSettings={updateSettings}
+          />
+        );
       case AppView.HOME:
         return (
           <Home 

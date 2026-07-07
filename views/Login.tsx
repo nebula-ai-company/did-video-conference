@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff, ArrowLeft, ShieldCheck, Video } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowLeft, ArrowRight, ShieldCheck, Video } from 'lucide-react';
 import { Button } from '../components/Button';
 import { AuthSidePanel } from '../components/AuthSidePanel';
 import { AppView } from '../types';
@@ -23,9 +23,20 @@ export const Login: React.FC<LoginProps> = ({ onChangeView, onLogin }) => {
   };
 
   return (
-    <div className="min-h-screen flex bg-white dark:bg-dark-bg transition-colors duration-200">
+    <div className="min-h-screen flex bg-white dark:bg-dark-bg transition-colors duration-200" dir="rtl">
       {/* Left Side (Form) */}
       <div className="flex-1 flex flex-col justify-center items-center p-6 sm:p-12 lg:p-24 relative animate-enter">
+        {/* Floating Back Button */}
+        <button
+          type="button"
+          onClick={() => onChangeView(AppView.LANDING)}
+          className="absolute top-6 right-6 flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 dark:border-white/10 hover:border-primary-500/30 bg-gray-50/50 dark:bg-black/20 hover:bg-gray-100 dark:hover:bg-white/[0.05] text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-all font-bold text-xs shadow-sm cursor-pointer group"
+          id="login-back-to-landing"
+        >
+          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          <span>بازگشت به خانه</span>
+        </button>
+
         <div className="w-full max-w-md space-y-8">
           <div className="text-center space-y-2">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">ورود به حساب کاربری</h1>
@@ -91,6 +102,16 @@ export const Login: React.FC<LoginProps> = ({ onChangeView, onLogin }) => {
                   className="font-bold text-primary-600 hover:text-primary-700 hover:underline"
                 >
                   درخواست عضویت
+                </button>
+              </div>
+
+              <div>
+                <button 
+                  type="button" 
+                  onClick={() => onChangeView(AppView.LANDING)}
+                  className="font-bold text-primary-605 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 hover:underline text-sm"
+                >
+                  بازگشت به صفحهٔ اصلی
                 </button>
               </div>
               

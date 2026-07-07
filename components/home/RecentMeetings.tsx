@@ -49,7 +49,7 @@ const MeetingItem: React.FC<MeetingItemProps> = ({ meeting, onJoin }) => {
             className="group relative flex items-center justify-between p-6 rounded-[1.5rem] cursor-pointer transition-all duration-300 hover:-translate-y-1"
         >
               {/* 1. Glass Background Layer */}
-             <div className="absolute inset-0 rounded-[1.5rem] bg-white/40 dark:bg-[#0A0A0A]/40 backdrop-blur-2xl border-2 border-slate-200/50 dark:border-white/10 shadow-lg group-hover:shadow-xl transition-all"></div>
+             <div className="absolute inset-0 rounded-[1.5rem] bg-white/80 dark:bg-black/80 backdrop-blur-2xl border-2 border-slate-200/50 dark:border-white/10 shadow-lg group-hover:shadow-xl transition-all"></div>
 
              {/* 2. Gradient Overlay for Depth (Top-Left Light Source) */}
              <div className="absolute inset-0 rounded-[1.5rem] bg-gradient-to-br from-white/10 to-transparent opacity-50 pointer-events-none"></div>

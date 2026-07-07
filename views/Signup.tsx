@@ -33,10 +33,17 @@ export const Signup: React.FC<SignupProps> = ({ onChangeView }) => {
           <div className="flex items-center justify-between">
              <button 
                onClick={() => onChangeView(AppView.LOGIN)}
-               className="flex items-center text-gray-500 hover:text-primary-600 transition-colors"
+               className="flex items-center text-gray-500 hover:text-primary-600 transition-colors text-sm font-semibold"
              >
                <ArrowRight className="w-4 h-4 ml-1" />
                بازگشت به ورود
+             </button>
+             <button 
+               type="button"
+               onClick={() => onChangeView(AppView.LANDING)}
+               className="flex items-center text-gray-500 hover:text-primary-600 transition-colors text-sm font-semibold"
+             >
+               بازگشت به صفحهٔ اصلی
              </button>
           </div>
 

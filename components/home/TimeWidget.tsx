@@ -50,7 +50,7 @@ export const TimeWidget: React.FC = () => {
         ref={cardRef}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className="bg-white/40 dark:bg-black/40 backdrop-blur-3xl shadow-sm dark:shadow-2xl rounded-[2.5rem] p-10 text-center relative overflow-hidden group animate-fade-up"
+        className="bg-white/80 dark:bg-black/80 backdrop-blur-3xl shadow-sm dark:shadow-2xl rounded-[2.5rem] p-10 text-center relative overflow-hidden group animate-fade-up"
     >
       {/* 1. Static Border */}
       <div className="absolute inset-0 rounded-[2.5rem] border border-white/40 dark:border-white/10 pointer-events-none"></div>

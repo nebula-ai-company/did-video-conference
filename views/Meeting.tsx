@@ -279,7 +279,7 @@ export const Meeting: React.FC<MeetingProps> = ({ onChangeView, meetingId, userS
        return 'grid-cols-1 grid-rows-2 md:grid-cols-2 md:grid-rows-1';
     }
 
-    if (n <= 4) return 'grid-cols-1 grid-rows-4 sm:grid-cols-2 sm:grid-rows-2'; 
+    if (n <= 4) return 'grid-cols-2 grid-rows-2'; 
     
     if (n <= 6) {
         if (isSidebarOpen) return 'grid-cols-2 grid-rows-3 lg:grid-cols-3 lg:grid-rows-2';
@@ -558,7 +558,7 @@ export const Meeting: React.FC<MeetingProps> = ({ onChangeView, meetingId, userS
                 // Standard Grid Layout
                 <div className={`grid gap-4 w-full min-h-full transition-all duration-500 justify-items-center items-center ${getGridClasses()}`}>
                     {participants.map(p => (
-                        <div key={p.id} className="w-full h-full min-h-[150px] sm:min-h-[200px] md:min-h-[245px] min-w-0 transition-all duration-500 flex items-center justify-center">
+                        <div key={p.id} className="w-full h-full min-h-[140px] sm:min-h-[200px] md:min-h-[245px] min-w-0 transition-all duration-500 flex items-center justify-center">
                             <VideoTile 
                                 participant={{
                                     ...p, 
@@ -566,7 +566,7 @@ export const Meeting: React.FC<MeetingProps> = ({ onChangeView, meetingId, userS
                                     audioOn: p.isMe ? micOn : p.audioOn
                                 }} 
                                 mediaStream={p.isMe ? localStream : undefined}
-                                className="rounded-[2rem] aspect-video max-w-full max-h-full w-auto h-auto"
+                                className="rounded-[1.5rem] sm:rounded-[2rem] w-full h-full"
                             />
                         </div>
                     ))}
@@ -596,7 +596,7 @@ export const Meeting: React.FC<MeetingProps> = ({ onChangeView, meetingId, userS
           
           {/* Reaction Popup (Absolute positioning maintained for stacked effect) */}
           {showEmojiPicker && (
-              <div className={`absolute bottom-20 sm:bottom-28 pointer-events-auto ${isDark ? 'bg-[#18181b]/90 border-white/10' : 'bg-white/95 border-slate-200 shadow-2xl text-slate-800'} backdrop-blur-xl border rounded-2xl p-1.5 sm:p-2 flex gap-1.5 sm:gap-2 shadow-2xl animate-[enter-up_0.3s_ease-out_forwards] z-[60]`}>
+              <div className={`absolute bottom-20 sm:bottom-28 pointer-events-auto ${isDark ? 'bg-zinc-900/90 border-white/10' : 'bg-white/95 border-slate-200 shadow-2xl text-slate-800'} backdrop-blur-xl border rounded-2xl p-1.5 sm:p-2 flex gap-1.5 sm:gap-2 shadow-2xl animate-[enter-up_0.3s_ease-out_forwards] z-[60]`}>
                   {['👍', '❤️', '👏', '😂', '😮', '🎉'].map(emoji => (
                       <button 
                         key={emoji}
@@ -638,7 +638,7 @@ export const Meeting: React.FC<MeetingProps> = ({ onChangeView, meetingId, userS
               </div>
 
               {/* CENTER: Main Control Bar */}
-              <div className={`relative z-20 ${isDark ? 'bg-[#09090b]/80 border-white/10 hover:bg-[#09090b]/90 ring-white/5 shadow-2xl' : 'bg-white/95 border-slate-200 shadow-xl text-slate-800'} backdrop-blur-xl border rounded-2xl sm:rounded-[2rem] h-14 sm:h-20 px-3 sm:px-6 flex items-center gap-1.5 sm:gap-3 transition-all duration-300 hover:scale-[1.02]`}>
+              <div className={`relative z-20 ${isDark ? 'bg-zinc-950/80 border-white/10 hover:bg-zinc-950/90 ring-white/5 shadow-2xl' : 'bg-white/95 border-slate-200 shadow-xl text-slate-800'} backdrop-blur-xl border rounded-2xl sm:rounded-[2rem] h-14 sm:h-20 px-3 sm:px-6 flex items-center gap-1.5 sm:gap-3 transition-all duration-300 hover:scale-[1.02]`}>
                   {/* Media Controls */}
                   <div className="flex items-center gap-1 sm:gap-2">
                       <ControlButton 
@@ -668,6 +668,7 @@ export const Meeting: React.FC<MeetingProps> = ({ onChangeView, meetingId, userS
                         offIcon={<MonitorUp />}
                         variant="action"
                         title="اشتراک‌گذاری صفحه"
+                        className="hidden sm:flex"
                       />
                       <ControlButton 
                         active={musicShare} 
@@ -676,6 +677,7 @@ export const Meeting: React.FC<MeetingProps> = ({ onChangeView, meetingId, userS
                         offIcon={<Music />}
                         variant="action"
                         title="اشتراک‌گذاری موزیک"
+                        className="hidden sm:flex"
                       />
                       <ControlButton 
                         active={showEmojiPicker}

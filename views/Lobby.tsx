@@ -79,7 +79,7 @@ const DeviceSelector: React.FC<DeviceSelectorProps> = ({
           w-full flex items-center justify-between gap-3 px-4 py-3.5 rounded-2xl border transition-all duration-200 outline-none group
           ${isOpen 
             ? (isDark ? 'bg-[#1F1F1F] border-primary-500 ring-1 ring-primary-500/50 text-white' : 'bg-white border-primary-500 ring-1 ring-primary-500/50 text-slate-800') 
-            : (isDark ? 'bg-[#121212]/80 border-white/5 text-gray-300 hover:bg-[#1A1A1A] hover:border-white/10' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-350 shadow-sm')}
+            : (isDark ? 'bg-zinc-900/80 border-white/5 text-gray-300 hover:bg-[#1A1A1A] hover:border-white/10' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-350 shadow-sm')}
           ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
         `}
       >
@@ -756,7 +756,7 @@ export const Lobby: React.FC<LobbyProps> = ({ onChangeView, userSettings, update
                 ref={cardRef}
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
-                className={`relative backdrop-blur-2xl rounded-[2rem] flex flex-col overflow-visible group h-full transition-all duration-305 ${isDark ? 'bg-[#121212]/90 border border-white/10 shadow-2xl' : 'bg-white border border-slate-200/80 shadow-2xl shadow-slate-200/50'}`}
+                className={`relative backdrop-blur-2xl rounded-[2rem] flex flex-col overflow-visible group h-full transition-all duration-305 ${isDark ? 'bg-zinc-950/95 border border-white/10 shadow-2xl' : 'bg-white border border-slate-200/80 shadow-2xl shadow-slate-200/50'}`}
             >
                 {/* 1. Static Border (Dark Mode Only) */}
                 {isDark && <div className="absolute inset-0 rounded-[2rem] border border-white/10 pointer-events-none"></div>}

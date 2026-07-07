@@ -236,7 +236,7 @@ export const CalendarWidget: React.FC<CalendarWidgetProps> = ({ className = '' }
         ref={cardRef}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className={`bg-white/40 dark:bg-black/40 backdrop-blur-3xl shadow-sm dark:shadow-2xl rounded-[2.5rem] p-8 flex flex-col animate-fade-up delay-1 overflow-hidden relative group ${className}`}
+        className={`bg-white/80 dark:bg-black/80 backdrop-blur-3xl shadow-sm dark:shadow-2xl rounded-[2.5rem] p-8 flex flex-col animate-fade-up delay-1 overflow-hidden relative group ${className}`}
     >
       {/* 1. Static Border */}
       <div className="absolute inset-0 rounded-[2.5rem] border border-white/40 dark:border-white/10 pointer-events-none"></div>
